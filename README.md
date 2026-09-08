@@ -11,7 +11,7 @@ directory structure (permalink paths) defined in WordPress.
 1. **`lib/simple_html_dom.php` is already included** - the same version
    used in the `generateStatic.php` setup (classic single-file API:
    `class simple_html_dom`, `str_get_html()`), for consistent behavior
-   between the demo and the plugin.
+   between the demo and the plugin (see: https://github.com/elverdaderobutschito/WP-Static-File-Generator).
 
 2. **phpseclib is already included** (version 3.0.43, sourced directly
    from [github.com/phpseclib/phpseclib](https://github.com/phpseclib/phpseclib),

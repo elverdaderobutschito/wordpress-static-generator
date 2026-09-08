@@ -1,0 +1,15 @@
+{
+    "name": "butsch/wp-static-deploy",
+    "description": "WordPress plugin dependencies for WP Static Deploy (SFTP via phpseclib3, Markdown export via league/html-to-markdown). Informational only - vendor/ is manually curated with a lightweight custom autoloader (see vendor/autoload.php), not a real 'composer install' output. No composer install step is required to use the plugin.",
+    "type": "wordpress-plugin",
+    "require": {
+        "php": ">=7.4",
+        "phpseclib/phpseclib": "^3.0",
+        "league/html-to-markdown": "^5.1"
+    },
+    "config": {
+        "platform": {
+            "php": "7.4"
+        }
+    }
+}

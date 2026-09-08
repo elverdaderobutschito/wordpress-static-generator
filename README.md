@@ -212,4 +212,3 @@ the template already has one of its own.
   inside it.
 - `vendor/paragonie/constant_time_encoding` - MIT license, see the
   `LICENSE.txt` file inside it.
-# wordpress-static-generator

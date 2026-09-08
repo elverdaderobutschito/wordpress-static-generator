@@ -34,26 +34,35 @@ class WPStatic_Forms {
 
         // Client-side required-field/email validation runs along
         // regardless of the target - purely in the browser, no server
-        // overhead.
+        // overhead. The messages are translated here (server-side, where
+        // WordPress' i18n is available) and passed to the static JS via
+        // data attributes, so the generated site shows validation
+        // messages in whatever language this WordPress install is
+        // configured for - not hard-coded to one language regardless of
+        // the site's actual audience.
         $validationScriptPath = '/' . self::VALIDATION_SCRIPT_FILENAME;
+        $validationMessages = [
+            'validation_msg_required' => __('This field is required.', 'wordpress-static-generator'),
+            'validation_msg_select_one' => __('Please select at least one option.', 'wordpress-static-generator'),
+        ];
 
         if ($settings['target'] === 'netlify') {
-            $generator->setFormHandling('netlify', [
+            $generator->setFormHandling('netlify', array_merge([
                 'redirect_url' => self::safeguardNetlifyRedirect($settings['form_redirect_url']),
                 'validation_script' => $validationScriptPath,
                 'honeypot_field' => $settings['form_honeypot_field'] !== '' ? $settings['form_honeypot_field'] : '_gotcha',
-            ]);
+            ], $validationMessages));
             return;
         }
 
         $customAction = trim($settings['form_custom_action']);
 
-        $generator->setFormHandling('handler', [
+        $generator->setFormHandling('handler', array_merge([
             'handler_path' => $customAction !== '' ? $customAction : '/' . self::HANDLER_FILENAME,
             'honeypot_field' => $settings['form_honeypot_field'] !== '' ? $settings['form_honeypot_field'] : '_gotcha',
             'redirect_url' => $settings['form_redirect_url'],
             'validation_script' => $validationScriptPath,
-        ]);
+        ], $validationMessages));
     }
 
     /**

@@ -505,9 +505,13 @@ class WPHeadlessStaticGenerator {
         }
 
         $honeypotField = $this->formOptions['honeypot_field'] ?? '';
+        $requiredMessage = $this->formOptions['validation_msg_required'] ?? '';
+        $selectOneMessage = $this->formOptions['validation_msg_select_one'] ?? '';
 
         $scriptTag = '<script src="' . htmlspecialchars($scriptPath, ENT_QUOTES) . '"'
             . ($honeypotField !== '' ? ' data-honeypot="' . htmlspecialchars($honeypotField, ENT_QUOTES) . '"' : '')
+            . ($requiredMessage !== '' ? ' data-msg-required="' . htmlspecialchars($requiredMessage, ENT_QUOTES) . '"' : '')
+            . ($selectOneMessage !== '' ? ' data-msg-select-one="' . htmlspecialchars($selectOneMessage, ENT_QUOTES) . '"' : '')
             . '></script>';
 
         if (strpos($body->innertext, '"' . htmlspecialchars($scriptPath, ENT_QUOTES) . '"') === false) {
@@ -805,7 +809,7 @@ class WPHeadlessStaticGenerator {
         if ($decoded === null && json_last_error() !== JSON_ERROR_NONE) {
             throw new WPApiException(sprintf(
                 /* translators: 1: request URL, 2: JSON error message */
-                __('WP API did not return valid JSON (%1$s): %2$s', 'wp-static-deploy'),
+                __('WP API did not return valid JSON (%1$s): %2$s', 'wordpress-static-generator'),
                 $url,
                 json_last_error_msg()
             ));

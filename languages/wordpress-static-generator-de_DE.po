@@ -1,13 +1,13 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the WP Static Deploy package.
+# This file is distributed under the same license as the WordPress Static Generator package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: WP Static Deploy 1.0.0\n"
+"Project-Id-Version: WordPress Static Generator 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-08 06:58+0000\n"
+"POT-Creation-Date: 2026-09-08 17:11+0000\n"
 "PO-Revision-Date: 2026-09-07 12:42+0000\n"
 "Last-Translator: elbutschito\n"
 "Language-Team: Deutsch\n"
@@ -17,15 +17,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: manual\n"
-
-#: wp-static-deploy.php:47
-msgid "WP Static Deploy requires PHP 7.4 or newer."
-msgstr "WP Static Deploy benötigt PHP 7.4 oder neuer."
-
-#: wp-static-deploy.php:56
-#, php-format
-msgid "WP Static Deploy: %s is missing. See lib/README-simple-html-dom.txt."
-msgstr "WP Static Deploy: %s fehlt. Siehe lib/README-simple-html-dom.txt."
 
 #: includes/class-wpstatic-netlify-uploader.php:20
 msgid "Netlify Site ID or token is missing from the settings."
@@ -63,8 +54,7 @@ msgstr "Unerwartete Antwort von Netlify - bitte Site-ID prüfen."
 
 #: includes/class-wpstatic-netlify-uploader.php:89
 msgid ""
-"Netlify does not support single-file transfer - please use "
-"uploadDirectory()."
+"Netlify does not support single-file transfer - please use uploadDirectory()."
 msgstr ""
 "Netlify unterstützt keine Einzeldatei-Übertragung - bitte uploadDirectory() "
 "verwenden."
@@ -115,11 +105,11 @@ msgstr "Export fehlgeschlagen: ZIP-Datei wurde nicht erzeugt."
 msgid "No \"assets/\" folder found after extraction."
 msgstr "Nach dem Entpacken wurde kein \"assets/\"-Verzeichnis gefunden."
 
-#: includes/class-wpstatic-assets-manager.php:139
+#: includes/class-wpstatic-assets-manager.php:140
 msgid "Could not move assets to the target location."
 msgstr "Konnte Assets nicht an den Zielort verschieben."
 
-#: includes/class-wpstatic-assets-manager.php:150
+#: includes/class-wpstatic-assets-manager.php:151
 msgid "Assets updated successfully."
 msgstr "Assets erfolgreich aktualisiert."
 
@@ -139,11 +129,10 @@ msgstr "Kein Host angegeben."
 #: includes/class-wpstatic-sftp-uploader.php:45
 #, php-format
 msgid ""
-"Could not connect to %1$s:%2$s. Please check host, port and "
-"firewall/network."
+"Could not connect to %1$s:%2$s. Please check host, port and firewall/network."
 msgstr ""
-"Konnte keine Verbindung zu %1$s:%2$s aufbauen. Bitte Host, Port und "
-"Firewall/Netzwerk prüfen."
+"Konnte keine Verbindung zu %1$s:%2$s aufbauen. Bitte Host, Port und Firewall/"
+"Netzwerk prüfen."
 
 #: includes/class-wpstatic-sftp-uploader.php:53
 msgid ""
@@ -160,21 +149,21 @@ msgstr "Privater Schlüssel"
 msgid "password"
 msgstr "Passwort"
 
-#: includes/class-wpstatic-sftp-uploader.php:83
+#: includes/class-wpstatic-sftp-uploader.php:82
 #, php-format
 msgid ""
 "Target directory \"%s\" could not be created/found. Please check the path "
 "and permissions of the SFTP user."
 msgstr ""
-"Zielverzeichnis \"%s\" konnte nicht angelegt/gefunden werden. Bitte Pfad und"
-" Rechte des SFTP-Nutzers prüfen."
+"Zielverzeichnis \"%s\" konnte nicht angelegt/gefunden werden. Bitte Pfad und "
+"Rechte des SFTP-Nutzers prüfen."
 
-#: includes/class-wpstatic-sftp-uploader.php:93
+#: includes/class-wpstatic-sftp-uploader.php:92
 #, php-format
 msgid "\"%s\" exists, but is not a directory. Please check the path."
 msgstr "\"%s\" existiert, ist aber kein Verzeichnis. Bitte Pfad prüfen."
 
-#: includes/class-wpstatic-sftp-uploader.php:105
+#: includes/class-wpstatic-sftp-uploader.php:104
 #, php-format
 msgid ""
 "Connection/login successful, but \"%1$s\" is not writable (%2$s). Please "
@@ -183,14 +172,22 @@ msgstr ""
 "Verbindung/Login erfolgreich, aber \"%1$s\" ist nicht beschreibbar (%2$s). "
 "Bitte Verzeichnis-Rechte für den SFTP-Nutzer prüfen."
 
-#: includes/class-wpstatic-sftp-uploader.php:127
+#: includes/class-wpstatic-sftp-uploader.php:126
 #, php-format
 msgid "Could not transfer file via SFTP: %1$s (%2$s)"
 msgstr "Konnte Datei nicht per SFTP übertragen: %1$s (%2$s)"
 
+#: includes/class-wpstatic-forms.php:45
+msgid "This field is required."
+msgstr "Dieses Feld ist erforderlich."
+
+#: includes/class-wpstatic-forms.php:46
+msgid "Please select at least one option."
+msgstr "Bitte mindestens eine Option auswählen."
+
 #: includes/class-wpstatic-settings.php:152
-#: includes/class-wpstatic-settings.php:847
-#: includes/class-wpstatic-settings.php:902
+#: includes/class-wpstatic-settings.php:848
+#: includes/class-wpstatic-settings.php:903
 msgid "Test connection"
 msgstr "Verbindung testen"
 
@@ -199,7 +196,7 @@ msgid "Deploying to target …"
 msgstr "Übertrage zum Ziel …"
 
 #: includes/class-wpstatic-settings.php:154
-#: includes/class-wpstatic-settings.php:919
+#: includes/class-wpstatic-settings.php:920
 msgid "Deploy all"
 msgstr "Alle übertragen"
 
@@ -212,7 +209,7 @@ msgid "Deploying assets …"
 msgstr "Übertrage Assets …"
 
 #: includes/class-wpstatic-settings.php:157
-#: includes/class-wpstatic-settings.php:922
+#: includes/class-wpstatic-settings.php:923
 msgid "Deploy assets only"
 msgstr "Nur Assets übertragen"
 
@@ -293,32 +290,31 @@ msgid "Request to WordPress failed."
 msgstr "Anfrage an WordPress fehlgeschlagen."
 
 #: includes/class-wpstatic-settings.php:181
-#: includes/class-wpstatic-settings.php:400
-#: includes/class-wpstatic-ajax.php:26
+#: includes/class-wpstatic-settings.php:401 includes/class-wpstatic-ajax.php:26
 msgid "Insufficient permissions."
 msgstr "Keine Berechtigung."
 
-#: includes/class-wpstatic-settings.php:251
+#: includes/class-wpstatic-settings.php:252
 msgid "Unknown error while uploading the default template."
 msgstr "Unbekannter Fehler beim Hochladen des Standard-Templates."
 
-#: includes/class-wpstatic-settings.php:287
+#: includes/class-wpstatic-settings.php:289
 msgid "Unknown error while uploading."
 msgstr "Unbekannter Fehler beim Hochladen."
 
-#: includes/class-wpstatic-settings.php:292
+#: includes/class-wpstatic-settings.php:294
 msgid "A name for the new template was given, but no file was selected."
 msgstr "Name für das neue Template angegeben, aber keine Datei ausgewählt."
 
-#: includes/class-wpstatic-settings.php:298
+#: includes/class-wpstatic-settings.php:300
 msgid ""
-"Please enter a name for the new template (required) - the file was therefore"
-" not saved."
+"Please enter a name for the new template (required) - the file was therefore "
+"not saved."
 msgstr ""
 "Bitte einen Namen für das neue Template vergeben (Pflichtfeld) - die Datei "
 "wurde deshalb nicht übernommen."
 
-#: includes/class-wpstatic-settings.php:320
+#: includes/class-wpstatic-settings.php:321
 msgid ""
 "Forms are enabled, but no recipient email address has been set - the form "
 "handler will reject incoming submissions until this is fixed."
@@ -326,7 +322,7 @@ msgstr ""
 "Formulare sind aktiviert, aber es ist keine Empfänger-E-Mail-Adresse "
 "hinterlegt - der Formular-Handler lehnt eingehende Nachrichten bis dahin ab."
 
-#: includes/class-wpstatic-settings.php:338
+#: includes/class-wpstatic-settings.php:339
 #, php-format
 msgid ""
 "The form \"thank you\" page points to your WordPress domain (%s). With "
@@ -341,57 +337,57 @@ msgstr ""
 "erscheinen. Bitte leer lassen oder eine relative Adresse auf der Netlify-"
 "Site selbst eintragen (z.B. /danke/)."
 
-#: includes/class-wpstatic-settings.php:370
+#: includes/class-wpstatic-settings.php:371
 #, php-format
 msgid ""
-"The request exceeds the server limit post_max_size (currently: %s). The file"
-" is too large to upload in this form."
+"The request exceeds the server limit post_max_size (currently: %s). The file "
+"is too large to upload in this form."
 msgstr ""
 "Die Anfrage überschreitet das Server-Limit post_max_size (aktuell: %s). "
 "Datei ist zu groß für einen Upload in diesem Formular."
 
-#: includes/class-wpstatic-settings.php:411
+#: includes/class-wpstatic-settings.php:412
 msgid "Export failed:"
 msgstr "Export fehlgeschlagen:"
 
-#: includes/class-wpstatic-settings.php:415
+#: includes/class-wpstatic-settings.php:416
 msgid "Export failed: the ZIP file was not created."
 msgstr "Export fehlgeschlagen: ZIP-Datei wurde nicht erzeugt."
 
-#: includes/class-wpstatic-settings.php:439
+#: includes/class-wpstatic-settings.php:440
 msgid "Generate automatically"
 msgstr "Automatisch generieren"
 
-#: includes/class-wpstatic-settings.php:443
+#: includes/class-wpstatic-settings.php:444
 msgid "Replace navigation markers in the template with real menu items"
 msgstr "Navigations-Marker im Template durch echte Menüpunkte ersetzen"
 
-#: includes/class-wpstatic-settings.php:448
+#: includes/class-wpstatic-settings.php:449
 msgid "WordPress menu"
 msgstr "WordPress-Menü"
 
-#: includes/class-wpstatic-settings.php:451
+#: includes/class-wpstatic-settings.php:452
 msgid "Select a menu"
 msgstr "Menü wählen"
 
-#: includes/class-wpstatic-settings.php:459
+#: includes/class-wpstatic-settings.php:460
 msgid "No menus found - create one first under Appearance → Menus."
 msgstr "Keine Menüs gefunden - unter Design → Menüs zunächst eines anlegen."
 
-#: includes/class-wpstatic-settings.php:464
+#: includes/class-wpstatic-settings.php:465
 msgid "Wrapper marker"
 msgstr "Wrapper-Marker"
 
-#: includes/class-wpstatic-settings.php:467
+#: includes/class-wpstatic-settings.php:468
 msgid "Wraps the ENTIRE menu area in the template (e.g. the outer <ul>)."
 msgstr ""
 "Umschließt den GESAMTEN Menü-Bereich im Template (z.B. das äußere <ul>)."
 
-#: includes/class-wpstatic-settings.php:471
+#: includes/class-wpstatic-settings.php:472
 msgid "Item marker"
 msgstr "Item-Marker"
 
-#: includes/class-wpstatic-settings.php:474
+#: includes/class-wpstatic-settings.php:475
 msgid ""
 "Wraps EXACTLY ONE demo menu item without sub-items (e.g. one <li>) - "
 "duplicated for each real menu item."
@@ -399,11 +395,11 @@ msgstr ""
 "Umschließt GENAU EINEN Demo-Menüpunkt ohne Unterpunkte (z.B. ein <li>) - "
 "wird pro echtem Menüpunkt vervielfältigt."
 
-#: includes/class-wpstatic-settings.php:478
+#: includes/class-wpstatic-settings.php:479
 msgid "Parent item marker (optional)"
 msgstr "Parent-Item-Marker (optional)"
 
-#: includes/class-wpstatic-settings.php:481
+#: includes/class-wpstatic-settings.php:482
 msgid ""
 "Only needed for multi-level menus. Without this marker, sub-items are "
 "ignored (flat display)."
@@ -411,29 +407,29 @@ msgstr ""
 "Nur nötig für mehrstufige Menüs. Ohne diesen Marker werden Unterpunkte "
 "ignoriert (flache Darstellung)."
 
-#: includes/class-wpstatic-settings.php:485
+#: includes/class-wpstatic-settings.php:486
 msgid "Submenu wrapper marker"
 msgstr "Submenu-Wrapper-Marker"
 
-#: includes/class-wpstatic-settings.php:488
+#: includes/class-wpstatic-settings.php:489
 msgid ""
-"Only relevant if \"Parent item marker\" is set - wraps the container for "
-"sub-items INSIDE the parent template."
+"Only relevant if \"Parent item marker\" is set - wraps the container for sub-"
+"items INSIDE the parent template."
 msgstr ""
-"Nur relevant, wenn \"Parent-Item-Marker\" gesetzt ist - umschließt INNERHALB"
-" der Parent-Vorlage den Container für die Unterpunkte."
+"Nur relevant, wenn \"Parent-Item-Marker\" gesetzt ist - umschließt INNERHALB "
+"der Parent-Vorlage den Container für die Unterpunkte."
 
-#: includes/class-wpstatic-settings.php:492
+#: includes/class-wpstatic-settings.php:493
 msgid "Submenu item marker (optional)"
 msgstr "Submenu-Item-Marker (optional)"
 
-#: includes/class-wpstatic-settings.php:495
+#: includes/class-wpstatic-settings.php:496
 msgid "Leave empty to use the same template as \"Item marker\" for sub-items."
 msgstr ""
 "Leer lassen, um für Unterpunkte dieselbe Vorlage wie \"Item-Marker\" zu "
 "verwenden."
 
-#: includes/class-wpstatic-settings.php:512
+#: includes/class-wpstatic-settings.php:513
 #, php-format
 msgid ""
 "The file exceeds the server limit upload_max_filesize (currently: %s). "
@@ -442,183 +438,185 @@ msgstr ""
 "Die Anfrage überschreitet das Server-Limit post_max_size (aktuell: %s). "
 "Datei ist zu groß für einen Upload in diesem Formular."
 
-#: includes/class-wpstatic-settings.php:516
+#: includes/class-wpstatic-settings.php:517
 msgid "The file exceeds the maximum allowed by the form."
 msgstr "Die Datei überschreitet das im Formular erlaubte Maximum."
 
-#: includes/class-wpstatic-settings.php:518
+#: includes/class-wpstatic-settings.php:519
 msgid "The file was only partially uploaded. Please try again."
 msgstr "Die Datei wurde nur teilweise hochgeladen. Bitte erneut versuchen."
 
-#: includes/class-wpstatic-settings.php:520
+#: includes/class-wpstatic-settings.php:521
 msgid "Server error: no temporary directory available for uploads."
 msgstr "Server-Fehler: Kein temporäres Verzeichnis für Uploads vorhanden."
 
-#: includes/class-wpstatic-settings.php:522
+#: includes/class-wpstatic-settings.php:523
 msgid "Server error: the file could not be written to disk."
 msgstr ""
 "Server-Fehler: Datei konnte nicht auf die Festplatte geschrieben werden."
 
-#: includes/class-wpstatic-settings.php:524
+#: includes/class-wpstatic-settings.php:525
 msgid "The upload was stopped by a PHP extension."
 msgstr "Der Upload wurde durch eine PHP-Erweiterung gestoppt."
 
-#: includes/class-wpstatic-settings.php:528
+#: includes/class-wpstatic-settings.php:529
 #, php-format
 msgid "Unknown upload error (code %d)."
 msgstr "Unbekannter Upload-Fehler (Code %d)."
 
-#: includes/class-wpstatic-settings.php:543
+#: includes/class-wpstatic-settings.php:544
 msgid "Static Deploy – Settings"
 msgstr "Static Deploy"
 
-#: includes/class-wpstatic-settings.php:547
+#: includes/class-wpstatic-settings.php:548
 msgid "You have unsaved changes."
 msgstr "Du hast ungespeicherte Änderungen."
 
-#: includes/class-wpstatic-settings.php:548
-msgid "\"Deploy all\" and \"Deploy assets only\" use the last"
-msgstr "\"Alle übertragen\" und \"Nur Assets übertragen\" verwenden die zuletzt"
-
 #: includes/class-wpstatic-settings.php:549
+msgid "\"Deploy all\" and \"Deploy assets only\" use the last"
+msgstr ""
+"\"Alle übertragen\" und \"Nur Assets übertragen\" verwenden die zuletzt"
+
+#: includes/class-wpstatic-settings.php:550
 msgid "saved"
 msgstr "gespeicherten"
 
-#: includes/class-wpstatic-settings.php:549
-msgid "settings, not your current input - please click \"Save settings\" first."
+#: includes/class-wpstatic-settings.php:550
+msgid ""
+"settings, not your current input - please click \"Save settings\" first."
 msgstr ""
 "Einstellungen, nicht deine aktuellen Eingaben - bitte zuerst auf "
 "\"Einstellungen speichern\" klicken."
 
-#: includes/class-wpstatic-settings.php:554
+#: includes/class-wpstatic-settings.php:555
 msgid "Settings saved."
 msgstr "Einstellungen gespeichert."
 
-#: includes/class-wpstatic-settings.php:566
+#: includes/class-wpstatic-settings.php:567
 msgid "Warning: suspicious file types found in the assets"
 msgstr "Warnung: verdächtige Dateitypen in den Assets gefunden"
 
-#: includes/class-wpstatic-settings.php:566
+#: includes/class-wpstatic-settings.php:567
 msgid "included anyway, please review"
 msgstr "werden trotzdem übernommen, bitte prüfen"
 
-#: includes/class-wpstatic-settings.php:603
+#: includes/class-wpstatic-settings.php:604
 msgid "No"
 msgstr "Kein"
 
-#: includes/class-wpstatic-settings.php:603
+#: includes/class-wpstatic-settings.php:604
 msgid "found in"
 msgstr "gefunden in"
 
-#: includes/class-wpstatic-settings.php:604
+#: includes/class-wpstatic-settings.php:605
 msgid ""
-"Secrets are still stored encrypted, but with an auto-generated key that also"
-" lives in the database. Recommended:"
+"Secrets are still stored encrypted, but with an auto-generated key that also "
+"lives in the database. Recommended:"
 msgstr ""
 "Secrets werden trotzdem verschlüsselt gespeichert, aber mit einem "
 "automatisch generierten Schlüssel, der ebenfalls in der Datenbank liegt. "
 "Empfohlen:"
 
-#: includes/class-wpstatic-settings.php:605
+#: includes/class-wpstatic-settings.php:606
 msgid "a-long-random-value"
 msgstr "ein-langer-zufälliger-wert"
 
-#: includes/class-wpstatic-settings.php:606
+#: includes/class-wpstatic-settings.php:607
 msgid "add to wp-config.php."
 msgstr "in wp-config.php ergänzen."
 
-#: includes/class-wpstatic-settings.php:614
+#: includes/class-wpstatic-settings.php:615
 msgid "SFTP target selected, but"
 msgstr "SFTP-Ziel ausgewählt, aber"
 
-#: includes/class-wpstatic-settings.php:614
+#: includes/class-wpstatic-settings.php:615
 msgid "was not found. See README.md in the plugin directory for installation."
 msgstr ""
 "wurde nicht gefunden. Siehe README.md im Plugin-Verzeichnis für die "
 "Installation."
 
-#: includes/class-wpstatic-settings.php:624
-#: includes/class-wpstatic-settings.php:632
+#: includes/class-wpstatic-settings.php:625
+#: includes/class-wpstatic-settings.php:633
 msgid "Content"
 msgstr "Inhalte"
 
-#: includes/class-wpstatic-settings.php:625
-#: includes/class-wpstatic-settings.php:801
+#: includes/class-wpstatic-settings.php:626
+#: includes/class-wpstatic-settings.php:802
 msgid "Navigation"
 msgstr "Navigation"
 
-#: includes/class-wpstatic-settings.php:626
-#: includes/class-wpstatic-settings.php:734
+#: includes/class-wpstatic-settings.php:627
+#: includes/class-wpstatic-settings.php:735
 msgid "Forms"
 msgstr "Formulare"
 
-#: includes/class-wpstatic-settings.php:627
-#: includes/class-wpstatic-settings.php:819
+#: includes/class-wpstatic-settings.php:628
+#: includes/class-wpstatic-settings.php:820
 msgid "Deployment target"
 msgstr "Übertragungsziel"
 
-#: includes/class-wpstatic-settings.php:628
-#: includes/class-wpstatic-settings.php:944
+#: includes/class-wpstatic-settings.php:629
+#: includes/class-wpstatic-settings.php:945
 msgid "Markdown export"
 msgstr "Markdown-Export"
 
-#: includes/class-wpstatic-settings.php:635
+#: includes/class-wpstatic-settings.php:636
 msgid "Post Types"
 msgstr "Post-Types"
 
-#: includes/class-wpstatic-settings.php:637
+#: includes/class-wpstatic-settings.php:638
 msgid "Posts"
 msgstr "Beiträge"
 
-#: includes/class-wpstatic-settings.php:638
+#: includes/class-wpstatic-settings.php:639
 msgid "Pages"
 msgstr "Seiten"
 
-#: includes/class-wpstatic-settings.php:642
+#: includes/class-wpstatic-settings.php:643
 msgid "Template file"
 msgstr "Template für diese Seite"
 
-#: includes/class-wpstatic-settings.php:645
+#: includes/class-wpstatic-settings.php:646
 msgid "Current:"
 msgstr "Aktuell:"
 
-#: includes/class-wpstatic-settings.php:649
+#: includes/class-wpstatic-settings.php:650
 msgid "HTML file with placeholders (e.g."
 msgstr "HTML-Datei mit Platzhaltern (z.B."
 
-#: includes/class-wpstatic-settings.php:649
+#: includes/class-wpstatic-settings.php:650
 msgid "Leave empty to keep the current file."
 msgstr "Leer lassen, um die aktuelle Datei zu behalten."
 
-#: includes/class-wpstatic-settings.php:653
+#: includes/class-wpstatic-settings.php:654
 msgid "Additional templates"
 msgstr "Zusätzliche Templates"
 
-#: includes/class-wpstatic-settings.php:657
+#: includes/class-wpstatic-settings.php:658
 msgid "Name"
 msgstr "Name"
 
-#: includes/class-wpstatic-settings.php:657
+#: includes/class-wpstatic-settings.php:658
 msgid "File"
 msgstr "Datei"
 
-#: includes/class-wpstatic-settings.php:657
+#: includes/class-wpstatic-settings.php:658
 msgid "Remove"
 msgstr "Entfernen"
 
-#: includes/class-wpstatic-settings.php:669
+#: includes/class-wpstatic-settings.php:670
 msgid "No additional templates set up yet."
 msgstr "Zusätzliche Templates"
 
-#: includes/class-wpstatic-settings.php:673
+#: includes/class-wpstatic-settings.php:674
 msgid "Add new template (name required):"
 msgstr "Neues Template hinzufügen (Name erforderlich):"
 
-#: includes/class-wpstatic-settings.php:674
+#: includes/class-wpstatic-settings.php:675
 msgid "e.g. Landing page (required so it appears in the dropdown)"
 msgstr "z.B. Landingpage (Pflichtfeld, damit es im Dropdown erscheint)"
 
-#: includes/class-wpstatic-settings.php:678
+#: includes/class-wpstatic-settings.php:679
 msgid ""
 "Then available per post/page as an alternative to the default template "
 "(dropdown in the \"Static Deploy\" meta box on the edit screen)."
@@ -627,98 +625,97 @@ msgstr ""
 "Auswahl (Dropdown in der Meta-Box \"Static Deploy\" in der jeweiligen "
 "Bearbeitung)."
 
-#: includes/class-wpstatic-settings.php:688
+#: includes/class-wpstatic-settings.php:689
 msgid "Currently set up:"
 msgstr "Aktuell hinterlegt:"
 
-#: includes/class-wpstatic-settings.php:688
+#: includes/class-wpstatic-settings.php:689
 msgid "files"
 msgstr "Dateien"
 
-#: includes/class-wpstatic-settings.php:691
+#: includes/class-wpstatic-settings.php:692
 msgid "last updated on"
 msgstr "zuletzt aktualisiert am"
 
-#: includes/class-wpstatic-settings.php:695
+#: includes/class-wpstatic-settings.php:696
 msgid "No assets set up yet."
 msgstr "Noch keine Assets hinterlegt."
 
-#: includes/class-wpstatic-settings.php:699
+#: includes/class-wpstatic-settings.php:700
 msgid "ZIP file whose root already is a folder named"
 msgstr "ZIP-Datei, deren Wurzelverzeichnis bereits ein Ordner ist, benannt"
 
-#: includes/class-wpstatic-settings.php:700
+#: includes/class-wpstatic-settings.php:701
 msgid "i.e. zip the assets folder itself, not just its contents"
 msgstr "also den assets-Ordner selbst zippen, nicht nur seinen Inhalt"
 
-#: includes/class-wpstatic-settings.php:701
-msgid "Copied 1:1 into the build folder so template references like"
-msgstr ""
-"Wird 1:1 in den Build-Ordner übernommen, damit Template-Referenzen wie"
-
 #: includes/class-wpstatic-settings.php:702
+msgid "Copied 1:1 into the build folder so template references like"
+msgstr "Wird 1:1 in den Build-Ordner übernommen, damit Template-Referenzen wie"
+
+#: includes/class-wpstatic-settings.php:703
 msgid "work."
 msgstr "funktionieren."
 
-#: includes/class-wpstatic-settings.php:705
+#: includes/class-wpstatic-settings.php:706
 msgid "Server upload limit: max."
 msgstr "Server-Limit für Uploads: max."
 
-#: includes/class-wpstatic-settings.php:706
+#: includes/class-wpstatic-settings.php:707
 msgid "per file,"
 msgstr "pro Datei,"
 
-#: includes/class-wpstatic-settings.php:706
+#: includes/class-wpstatic-settings.php:707
 msgid ""
 "per form submission overall. If your ZIP is bigger, please compress/trim "
-"assets first (e.g. remove unused font weights) or ask your host to raise the"
-" limit."
+"assets first (e.g. remove unused font weights) or ask your host to raise the "
+"limit."
 msgstr ""
 "pro Formular-Übertragung insgesamt. Ist deine ZIP größer, bitte Assets "
 "vorher komprimieren/ausdünnen (z.B. ungenutzte Font-Weights entfernen) oder "
 "das Limit beim Hoster erhöhen lassen."
 
-#: includes/class-wpstatic-settings.php:711
+#: includes/class-wpstatic-settings.php:712
 msgid "Date format"
 msgstr "Formulare aktivieren"
 
-#: includes/class-wpstatic-settings.php:715
+#: includes/class-wpstatic-settings.php:716
 msgid "Remove WP CSS classes"
 msgstr "WP-CSS-Klassen entfernen"
 
-#: includes/class-wpstatic-settings.php:716
+#: includes/class-wpstatic-settings.php:717
 msgid "active"
 msgstr "aktiv"
 
-#: includes/class-wpstatic-settings.php:719
+#: includes/class-wpstatic-settings.php:720
 msgid "Data injection rules"
 msgstr "Data-Injection-Regeln"
 
-#: includes/class-wpstatic-settings.php:723
+#: includes/class-wpstatic-settings.php:724
 msgid "Change-URL rules"
 msgstr "Change-URL-Regeln"
 
-#: includes/class-wpstatic-settings.php:727
+#: includes/class-wpstatic-settings.php:728
 msgid "Tidy HTML rules"
 msgstr "Tidy-HTML-Regeln"
 
-#: includes/class-wpstatic-settings.php:737
+#: includes/class-wpstatic-settings.php:738
 msgid "Enable forms"
 msgstr "Formulare aktivieren"
 
-#: includes/class-wpstatic-settings.php:741
+#: includes/class-wpstatic-settings.php:742
 msgid "Make &lt;form&gt; tags on generated pages functional"
 msgstr "&lt;form&gt;-Tags in generierten Seiten funktionsfähig machen"
 
-#: includes/class-wpstatic-settings.php:744
+#: includes/class-wpstatic-settings.php:745
 msgid "forms automatically get"
 msgstr "Automatisch generieren"
 
-#: includes/class-wpstatic-settings.php:745
+#: includes/class-wpstatic-settings.php:746
 msgid "and a hidden"
 msgstr "und ein verstecktes"
 
-#: includes/class-wpstatic-settings.php:745
+#: includes/class-wpstatic-settings.php:746
 msgid ""
 "field - Netlify Forms then detects and processes them on its own, no server "
 "code needed."
@@ -726,45 +723,45 @@ msgstr ""
 "Feld - Netlify Forms erkennt und verarbeitet sie dann selbstständig, kein "
 "eigener Server-Code nötig."
 
-#: includes/class-wpstatic-settings.php:746
+#: includes/class-wpstatic-settings.php:747
 msgid "the form"
 msgstr "Formulare aktivieren"
 
-#: includes/class-wpstatic-settings.php:746
+#: includes/class-wpstatic-settings.php:747
 msgid "is rewritten to a bundled PHP handler"
 msgstr "wird auf einen mitgelieferten PHP-Handler umgeschrieben"
 
-#: includes/class-wpstatic-settings.php:746
+#: includes/class-wpstatic-settings.php:747
 msgid "that emails submissions. Requires the target server to run PHP."
 msgstr ""
 "der die Eingaben per E-Mail verschickt. Setzt voraus, dass auf dem "
 "Zielserver PHP ausgeführt wird."
 
-#: includes/class-wpstatic-settings.php:751
+#: includes/class-wpstatic-settings.php:752
 msgid "Recipient email (SFTP only)"
 msgstr "Empfänger-E-Mail (nur SFTP)"
 
-#: includes/class-wpstatic-settings.php:755
+#: includes/class-wpstatic-settings.php:756
 msgid "Sender address (SFTP only)"
 msgstr "Absender-Adresse (nur SFTP)"
 
-#: includes/class-wpstatic-settings.php:758
+#: includes/class-wpstatic-settings.php:759
 msgid ""
-"Leave empty to use the server default address. Many hosts only accept sender"
-" addresses from their own domain."
+"Leave empty to use the server default address. Many hosts only accept sender "
+"addresses from their own domain."
 msgstr ""
 "Leer lassen, um die Server-Standardadresse zu verwenden. Viele Hoster "
 "akzeptieren nur Absenderadressen der eigenen Domain."
 
-#: includes/class-wpstatic-settings.php:762
+#: includes/class-wpstatic-settings.php:763
 msgid "Subject prefix (SFTP only)"
 msgstr "Betreff-Präfix (nur SFTP)"
 
-#: includes/class-wpstatic-settings.php:766
+#: includes/class-wpstatic-settings.php:767
 msgid "Thank-you page (Netlify + SFTP)"
 msgstr "Danke-Seite (Netlify + SFTP)"
 
-#: includes/class-wpstatic-settings.php:770
+#: includes/class-wpstatic-settings.php:771
 msgid ""
 "Leave empty to redirect back to the originating page after submission "
 "automatically. Important for Netlify: the form's original"
@@ -772,11 +769,11 @@ msgstr ""
 "Leer lassen, um nach dem Absenden automatisch zur Ausgangsseite "
 "zurückzuleiten. Bei Netlify wichtig: Die ursprüngliche"
 
-#: includes/class-wpstatic-settings.php:770
+#: includes/class-wpstatic-settings.php:771
 msgid "points to a WordPress URL"
 msgstr "des Formulars (zeigt auf eine WordPress-URL)"
 
-#: includes/class-wpstatic-settings.php:770
+#: includes/class-wpstatic-settings.php:771
 msgid ""
 "is always replaced - either by this thank-you page, or, if empty, by "
 "removing the"
@@ -784,71 +781,70 @@ msgstr ""
 "wird immer ersetzt - entweder durch diese Danke-Seite oder, falls leer, "
 "durch Entfernen der"
 
-#: includes/class-wpstatic-settings.php:770
+#: includes/class-wpstatic-settings.php:771
 msgid "submits to the current page"
 msgstr "Submit an die aktuelle Seite"
 
-#: includes/class-wpstatic-settings.php:775
+#: includes/class-wpstatic-settings.php:776
 msgid "Honeypot field name (SFTP only)"
 msgstr "Honeypot-Feldname (nur SFTP)"
 
-#: includes/class-wpstatic-settings.php:778
+#: includes/class-wpstatic-settings.php:779
 msgid ""
-"Simple spam deterrent: a CSS-hidden field that only bots fill in. "
-"Letters/numbers/underscore/hyphen only."
+"Simple spam deterrent: a CSS-hidden field that only bots fill in. Letters/"
+"numbers/underscore/hyphen only."
 msgstr ""
 "Einfache Spam-Bremse: ein per CSS verstecktes Feld, das nur Bots ausfüllen. "
 "Nur Buchstaben/Zahlen/Unterstrich/Bindestrich."
 
-#: includes/class-wpstatic-settings.php:782
+#: includes/class-wpstatic-settings.php:783
 msgid "Custom form target (SFTP only)"
 msgstr "Individuelles Formular-Ziel (nur SFTP)"
 
-#: includes/class-wpstatic-settings.php:786
+#: includes/class-wpstatic-settings.php:787
 msgid "Leave empty to use our bundled PHP handler"
 msgstr "Leer lassen, um unseren mitgelieferten PHP-Handler zu verwenden"
 
-#: includes/class-wpstatic-settings.php:786
+#: includes/class-wpstatic-settings.php:787
 msgid ""
 "requires the target server to run PHP. If something else runs there (e.g. "
 "your own endpoint, an external form service), enter its URL here - the form"
 msgstr ""
-"setzt voraus, dass auf dem Zielserver PHP läuft. Läuft dort etwas anderes "
-"(z.B. ein eigener Endpunkt, ein externer Formular-Dienst), hier die URL "
+"setzt voraus, dass auf dem Zielserver PHP läuft. Läuft dort etwas anderes (z."
+"B. ein eigener Endpunkt, ein externer Formular-Dienst), hier die URL "
 "eintragen - die"
 
-#: includes/class-wpstatic-settings.php:786
+#: includes/class-wpstatic-settings.php:787
 msgid "is then rewritten to it, and our"
 msgstr "der Formulare wird dann darauf umgeschrieben, unser"
 
-#: includes/class-wpstatic-settings.php:786
+#: includes/class-wpstatic-settings.php:787
 msgid "is not created/uploaded in that case."
 msgstr "wird in dem Fall nicht mit erzeugt/hochgeladen."
 
-#: includes/class-wpstatic-settings.php:792
+#: includes/class-wpstatic-settings.php:793
 msgid "Client-side validation"
 msgstr "Client-seitige Validierung"
 
-#: includes/class-wpstatic-settings.php:794
+#: includes/class-wpstatic-settings.php:795
 msgid ""
-"Runs automatically as soon as forms are enabled above (for Netlify AND SFTP)"
-" - no extra toggle needed. Checks in the browser BEFORE submitting: fields "
+"Runs automatically as soon as forms are enabled above (for Netlify AND SFTP) "
+"- no extra toggle needed. Checks in the browser BEFORE submitting: fields "
 "with"
 msgstr ""
-"Läuft automatisch mit, sobald Formulare oben aktiviert sind (für Netlify UND"
-" SFTP) - kein zusätzlicher Schalter nötig. Prüft im Browser, BEVOR "
+"Läuft automatisch mit, sobald Formulare oben aktiviert sind (für Netlify UND "
+"SFTP) - kein zusätzlicher Schalter nötig. Prüft im Browser, BEVOR "
 "abgeschickt wird: Felder mit"
 
-#: includes/class-wpstatic-settings.php:795
+#: includes/class-wpstatic-settings.php:796
 msgid "must be filled in (for checkbox/radio groups: at least one option),"
 msgstr ""
-"müssen ausgefüllt sein (bei Checkbox-/Radio-Gruppen: mindestens eine "
-"Option),"
+"müssen ausgefüllt sein (bei Checkbox-/Radio-Gruppen: mindestens eine Option),"
 
-#: includes/class-wpstatic-settings.php:796
+#: includes/class-wpstatic-settings.php:797
 msgid ""
-"fields must look like an email address. Most accessible form plugins (Fluent"
-" Forms, WPForms, Gravity Forms etc.) already set these attributes "
+"fields must look like an email address. Most accessible form plugins (Fluent "
+"Forms, WPForms, Gravity Forms etc.) already set these attributes "
 "automatically - no configuration needed. If your form plugin doesn't set "
 "these attributes, the check simply doesn't apply (data is then submitted "
 "unvalidated, as before)."
@@ -859,7 +855,7 @@ msgstr ""
 "Formular-Plugin diese Attribute nicht, greift die Prüfung nicht (die Daten "
 "werden dann einfach unvalidiert übertragen, wie bisher)."
 
-#: includes/class-wpstatic-settings.php:803
+#: includes/class-wpstatic-settings.php:804
 msgid ""
 "Replaces marker comments in the template with real menu items from a "
 "WordPress menu. Details for each marker are right next to the respective "
@@ -869,19 +865,19 @@ msgstr ""
 "WordPress-Menü. Details zu den einzelnen Markern direkt bei den jeweiligen "
 "Feldern unten."
 
-#: includes/class-wpstatic-settings.php:805
+#: includes/class-wpstatic-settings.php:806
 msgid "Main navigation"
 msgstr "Navigation"
 
-#: includes/class-wpstatic-settings.php:806
+#: includes/class-wpstatic-settings.php:807
 msgid "Footer navigation"
 msgstr "Navigation"
 
-#: includes/class-wpstatic-settings.php:809
+#: includes/class-wpstatic-settings.php:810
 msgid "CSS class for active page"
 msgstr "CSS-Klasse für aktive Seite"
 
-#: includes/class-wpstatic-settings.php:812
+#: includes/class-wpstatic-settings.php:813
 msgid ""
 "Set on the first &lt;a&gt; tag of the menu item matching the page currently "
 "being generated - applies to main and footer navigation alike."
@@ -890,19 +886,19 @@ msgstr ""
 "generierten Seite entspricht - gilt für Haupt- und Footer-Navigation "
 "gleichermaßen."
 
-#: includes/class-wpstatic-settings.php:822
+#: includes/class-wpstatic-settings.php:823
 msgid "Target"
 msgstr "Ziel"
 
-#: includes/class-wpstatic-settings.php:842
+#: includes/class-wpstatic-settings.php:843
 msgid "A token is already saved. Leave empty to keep it."
 msgstr "Ein Token ist bereits gespeichert. Leer lassen, um es zu behalten."
 
-#: includes/class-wpstatic-settings.php:842
+#: includes/class-wpstatic-settings.php:843
 msgid "No token saved yet."
 msgstr "Noch kein Token gespeichert."
 
-#: includes/class-wpstatic-settings.php:851
+#: includes/class-wpstatic-settings.php:852
 msgid ""
 "Important: Netlify deploys always replace the entire site content. The "
 "single-page button (on every post/page edit screen) therefore triggers a "
@@ -913,53 +909,53 @@ msgstr ""
 "Netlify deshalb einen kompletten Rebuild + Redeploy aus, nicht nur ein "
 "Update dieser einen Seite."
 
-#: includes/class-wpstatic-settings.php:867
+#: includes/class-wpstatic-settings.php:868
 msgid "Username"
 msgstr "Benutzername"
 
-#: includes/class-wpstatic-settings.php:871
+#: includes/class-wpstatic-settings.php:872
 msgid "Authentication"
 msgstr "Authentifizierung"
 
-#: includes/class-wpstatic-settings.php:873
-#: includes/class-wpstatic-settings.php:879
+#: includes/class-wpstatic-settings.php:874
+#: includes/class-wpstatic-settings.php:880
 msgid "Password"
 msgstr "Passwort"
 
-#: includes/class-wpstatic-settings.php:875
+#: includes/class-wpstatic-settings.php:876
 msgid "Private key"
 msgstr "Privater Schlüssel"
 
-#: includes/class-wpstatic-settings.php:882
-#: includes/class-wpstatic-settings.php:889
+#: includes/class-wpstatic-settings.php:883
+#: includes/class-wpstatic-settings.php:890
 msgid "Already saved. Leave empty to keep it."
 msgstr "Bereits gespeichert. Leer lassen, um es zu behalten."
 
-#: includes/class-wpstatic-settings.php:886
+#: includes/class-wpstatic-settings.php:887
 msgid "Private key (PEM)"
 msgstr "Privater Schlüssel"
 
-#: includes/class-wpstatic-settings.php:893
+#: includes/class-wpstatic-settings.php:894
 msgid "Passphrase (if any)"
 msgstr "Passphrase (falls vorhanden)"
 
-#: includes/class-wpstatic-settings.php:897
+#: includes/class-wpstatic-settings.php:898
 msgid "Target directory on the server"
 msgstr "Ziel-Verzeichnis auf dem Server"
 
-#: includes/class-wpstatic-settings.php:909
+#: includes/class-wpstatic-settings.php:910
 msgid "Save settings"
 msgstr "Einstellungen speichern"
 
-#: includes/class-wpstatic-settings.php:916
+#: includes/class-wpstatic-settings.php:917
 msgid "Deployment"
 msgstr "Übertragung"
 
-#: includes/class-wpstatic-settings.php:928
+#: includes/class-wpstatic-settings.php:929
 msgid "Upload assets when deploying"
 msgstr "Nur Assets übertragen"
 
-#: includes/class-wpstatic-settings.php:931
+#: includes/class-wpstatic-settings.php:932
 msgid ""
 "On Netlify, assets are always uploaded (a deploy replaces the entire "
 "content) - this option has no effect here."
@@ -967,11 +963,11 @@ msgstr ""
 "Bei Netlify werden Assets immer mit übertragen (ein Deploy ersetzt den "
 "kompletten Inhalt) - diese Option wirkt sich hier nicht aus."
 
-#: includes/class-wpstatic-settings.php:946
+#: includes/class-wpstatic-settings.php:947
 msgid "Exports all posts/pages as plain"
 msgstr "Exportiert alle Beiträge/Seiten als reine"
 
-#: includes/class-wpstatic-settings.php:946
+#: includes/class-wpstatic-settings.php:947
 msgid ""
 "files with YAML front matter (title, date, slug) - meant for other systems "
 "(Hugo, Jekyll, Eleventy, Obsidian vault etc.),"
@@ -979,37 +975,37 @@ msgstr ""
 "-Dateien mit YAML-Frontmatter (Titel, Datum, Slug) - gedacht für andere "
 "Systeme (Hugo, Jekyll, Eleventy, Obsidian-Vault etc.),"
 
-#: includes/class-wpstatic-settings.php:947
+#: includes/class-wpstatic-settings.php:948
 msgid "not"
 msgstr "nicht"
 
-#: includes/class-wpstatic-settings.php:947
+#: includes/class-wpstatic-settings.php:948
 msgid ""
-"as a deployable website. Runs independently of SFTP/Netlify; the result is a"
-" direct ZIP download."
+"as a deployable website. Runs independently of SFTP/Netlify; the result is a "
+"direct ZIP download."
 msgstr ""
 "als deploybare Website. Läuft unabhängig von SFTP/Netlify; das Ergebnis ist "
 "ein direkter ZIP-Download."
 
-#: includes/class-wpstatic-settings.php:955
+#: includes/class-wpstatic-settings.php:956
 msgid "Download images and rewrite references as relative paths"
 msgstr "Bilder herunterladen und Verweise als relative Pfade umschreiben"
 
-#: includes/class-wpstatic-settings.php:959
+#: includes/class-wpstatic-settings.php:960
 msgid "Enabled: images are additionally included in the ZIP (under"
 msgstr "Aktiv: Bilder landen zusätzlich im ZIP (unter"
 
-#: includes/class-wpstatic-settings.php:959
+#: includes/class-wpstatic-settings.php:960
 msgid ""
 "references become relative - the export then also works without a running "
 "WordPress instance. Disabled: image links stay unchanged and keep pointing "
 "to your WordPress site."
 msgstr ""
 "Verweise werden relativ - der Export funktioniert dann auch ohne laufende "
-"WordPress-Instanz. Inaktiv: Bild-Links bleiben unverändert und zeigen weiter"
-" auf deine WordPress-Seite."
+"WordPress-Instanz. Inaktiv: Bild-Links bleiben unverändert und zeigen weiter "
+"auf deine WordPress-Seite."
 
-#: includes/class-wpstatic-settings.php:962
+#: includes/class-wpstatic-settings.php:963
 msgid "Export as Markdown now"
 msgstr "Jetzt als Markdown exportieren"
 
@@ -1125,7 +1121,19 @@ msgstr "Verbindung erfolgreich, Zielverzeichnis ist beschreibbar."
 msgid "Connection successful, site found."
 msgstr "Verbindung erfolgreich, Site gefunden."
 
-#: lib/WPHeadlessStaticGenerator.php:811
+#: lib/WPHeadlessStaticGenerator.php:812
 #, php-format
 msgid "WP API did not return valid JSON (%1$s): %2$s"
 msgstr "WP-API lieferte kein gültiges JSON (%1$s): %2$s"
+
+#: wordpress-static-generator.php:46
+msgid "WordPress Static Generator requires PHP 7.4 or newer."
+msgstr "WordPress Static Generator benötigt PHP 7.4 oder neuer."
+
+#: wordpress-static-generator.php:55
+#, php-format
+msgid ""
+"WordPress Static Generator: %s is missing. See lib/README-simple-html-dom."
+"txt."
+msgstr ""
+"WordPress Static Generator: %s fehlt. Siehe lib/README-simple-html-dom.txt."

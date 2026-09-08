@@ -1,7 +1,7 @@
-=== WP Static Deploy ===
+=== WordPress Static Generator ===
 Contributors: elbutschito
 Tags: static site, static export, netlify, sftp, headless cms
-Requires at least: 7.1
+Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
 Stable tag: 1.0.0
@@ -12,7 +12,7 @@ Turns your WordPress content into a static HTML site and deploys it to Netlify o
 
 == Description ==
 
-WP Static Deploy generates a fully static HTML export of your WordPress posts and pages, using WordPress purely as a headless content source, and pushes the result to a deployment target of your choice: Netlify or any standard SFTP host.
+WordPress Static Generator generates a fully static HTML export of your WordPress posts and pages, using WordPress purely as a headless content source, and pushes the result to a deployment target of your choice: Netlify or any standard SFTP host.
 
 **Core features**
 
@@ -24,7 +24,7 @@ WP Static Deploy generates a fully static HTML export of your WordPress posts an
 * **Markdown export** - export all content as plain `.md` files with YAML front matter, optionally bundling and localizing referenced images, for use with static-site generators such as Hugo, Jekyll, or Eleventy, or for archiving in a note-taking tool.
 * **HTML cleanup rules** - remove WordPress-only CSS classes, strip or change arbitrary attributes via simple selector-based rules, and inject custom per-post data into the template.
 
-WP Static Deploy is aimed at agencies and developers who want the editorial convenience of WordPress combined with the speed, security, and low hosting cost of a static site.
+WordPress Static Generator is aimed at agencies and developers who want the editorial convenience of WordPress combined with the speed, security, and low hosting cost of a static site.
 
 = Bundled libraries =
 
@@ -48,7 +48,7 @@ No data is sent anywhere without an explicit action from you, and no usage track
 
 == Installation ==
 
-1. Upload the plugin files to the `/wp-content/plugins/wp-static-deploy` directory, or install the plugin through the WordPress plugins screen directly.
+1. Upload the plugin files to the `/wp-content/plugins/wordpress-static-generator` directory, or install the plugin through the WordPress plugins screen directly.
 2. Activate the plugin through the "Plugins" screen in WordPress.
 3. Go to "Static Deploy" in the admin menu to configure a template, choose a deployment target (SFTP or Netlify), and set up any optional features (forms, navigation, Markdown export).
 4. Optional but recommended: define `WPSTATIC_ENCRYPTION_KEY` in `wp-config.php` before entering SFTP/Netlify credentials, so stored secrets are encrypted with a key that isn't stored in the database itself.
@@ -73,8 +73,9 @@ Yes. The navigation feature is opt-in per navigation (main/footer) and does noth
 
 == Screenshots ==
 
-1. Tabbed settings screen (Content, Navigation, Forms, Deployment target, Markdown export).
-2. Deployment progress with live status.
+1. Content tab - choose post types, upload a template, add per-page alternative templates, and manage the assets (CSS/JS/fonts/images) bundle.
+2. Deployment target tab - configure an SFTP host (password or private key authentication) or switch to Netlify.
+3. Forms tab - enable working contact forms on the static site, with recipient email, thank-you page, honeypot spam protection, and a custom form target option.
 
 == Changelog ==
 

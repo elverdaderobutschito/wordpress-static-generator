@@ -1,37 +1,37 @@
 /**
- * WP Static Deploy - leichtgewichtige Formular-Validierung.
+ * WordPress Static Generator - lightweight form validation.
  *
- * Prüft im Browser, BEVOR ein Formular abgeschickt wird:
- *  - Felder mit aria-required="true" müssen ausgefüllt sein (bei
- *    Checkbox-/Radio-Gruppen: mindestens eine Option der Gruppe).
- *  - type="email"-Felder müssen (falls ausgefüllt) wie eine gültige
- *    E-Mail-Adresse aussehen (nutzt die native Browser-Prüfung).
+ * Checks in the browser BEFORE a form is submitted:
+ *  - fields with aria-required="true" must be filled in (for
+ *    checkbox/radio groups: at least one option in the group).
+ *  - type="email" fields must (if filled in) look like a valid email
+ *    address (uses the browser's native validation).
  *
- * Bewusst KEIN Framework, keine Abhängigkeiten - nutzt die native
- * HTML5-Validierungs-UI des Browsers (setCustomValidity/reportValidity),
- * damit Fehlermeldungen ohne eigenes CSS konsistent aussehen.
+ * Deliberately NO framework, no dependencies - uses the browser's
+ * native HTML5 validation UI (setCustomValidity/reportValidity), so
+ * error messages look consistent without any custom CSS.
  *
- * Warum aria-required statt required? Viele Formular-Plugins (z.B.
- * Fluent Forms) markieren Pflichtfelder aus Barrierefreiheits-Gründen
- * mit aria-required="true", nicht mit dem nativen required-Attribut
- * (das der Browser selbst ohne jedes JS durchsetzen würde). Dieses
- * Skript schließt genau diese Lücke.
+ * Why aria-required instead of required? Many form plugins (e.g.
+ * Fluent Forms) mark required fields for accessibility reasons with
+ * aria-required="true", not with the native required attribute (which
+ * the browser itself would enforce without any JS). This script closes
+ * exactly that gap.
  */
 (function () {
     'use strict';
 
     /**
-     * Erkennt technische/interne Formularfelder (WordPress-Nonces,
-     * AJAX-Routing-Felder, plugin-eigene interne Marker wie bei Fluent
-     * Forms __fluent_protection_token_12, _fluentform_12_fluentformnonce,
-     * _wp_http_referer etc.) - dieselbe Logik wie im PHP-Formular-Handler
-     * (siehe form-handler-template.php), hier aber VOR dem eigentlichen
-     * Absenden angewendet, damit weder Netlify noch der PHP-Handler diese
-     * Felder überhaupt erst zu Gesicht bekommen.
+     * Detects technical/internal form fields (WordPress nonces, AJAX
+     * routing fields, plugin-internal markers such as Fluent Forms'
+     * __fluent_protection_token_12, _fluentform_12_fluentformnonce,
+     * _wp_http_referer etc.) - the same logic as in the PHP form handler
+     * (see form-handler-template.php), but applied here BEFORE the
+     * actual submit, so neither Netlify nor the PHP handler ever gets to
+     * see these fields at all.
      */
     function isTechnicalField(name, honeypotField) {
         if (name === honeypotField) {
-            return false; // das eigene Honeypot-Feld MUSS mitgesendet werden
+            return false; // the honeypot field itself MUST be submitted
         }
 
         if (name === '' || name.charAt(0) === '_') {
@@ -46,9 +46,9 @@
     }
 
     /**
-     * Deaktiviert technische Felder kurz vor dem echten Absenden -
-     * deaktivierte Felder werden von Browsern automatisch NICHT
-     * mitgesendet (kein manuelles Entfernen aus dem DOM nötig).
+     * Disables technical fields right before the real submit - disabled
+     * fields are automatically NOT submitted by browsers (no manual
+     * removal from the DOM needed).
      */
     function stripTechnicalFields(form, honeypotField) {
         form.querySelectorAll('input, select, textarea').forEach(function (field) {
@@ -63,14 +63,14 @@
     }
 
     /**
-     * Setzt eine ggf. gesetzte Custom-Fehlermeldung sofort zurück, sobald
-     * der Nutzer mit dem Feld interagiert - NICHT erst beim nächsten
-     * Absenden-Versuch. Wichtig: Der Browser prüft VOR dem Auslösen des
-     * submit-Ereignisses, ob das Formular schon eine gesetzte
-     * Fehlermeldung hat - ist das der Fall, wird das submit-Ereignis gar
-     * nicht erst gefeuert, unser Reset-Code (der bisher nur innerhalb der
-     * submit-Behandlung lief) käme dann nie mehr zum Zug, und die
-     * Meldung bliebe dauerhaft hängen, egal was man danach einträgt.
+     * Resets a previously set custom error message as soon as the user
+     * interacts with the field - not only on the next submit attempt.
+     * Important: the browser checks BEFORE firing the submit event
+     * whether the form already has a custom error message set - if so,
+     * the submit event never fires at all, our reset code (which
+     * previously only ran inside the submit handler) would then never
+     * run again, and the message would stay stuck permanently no matter
+     * what gets entered afterwards.
      */
     function attachLiveReset(field) {
         if (typeof field.setCustomValidity !== 'function') {
@@ -84,21 +84,21 @@
         });
     }
 
-    function validateForm(form) {
+    function validateForm(form, messages) {
         var valid = true;
 
         var allRequired = form.querySelectorAll('[aria-required="true"]');
         var emailFields = form.querySelectorAll('input[type="email"]');
 
-        // Vorherige Custom-Fehler zurücksetzen.
+        // Reset any previous custom errors.
         allRequired.forEach(function (field) {
             if (typeof field.setCustomValidity === 'function') {
                 field.setCustomValidity('');
             }
         });
 
-        // Checkbox-/Radio-Gruppen (gleicher name) getrennt behandeln:
-        // "mindestens eine Option der Gruppe" statt "jede einzelne".
+        // Handle checkbox/radio groups (same name) separately: "at least
+        // one option in the group" instead of "every single one".
         var groupNames = [];
         allRequired.forEach(function (field) {
             if (isCheckboxOrRadio(field) && field.name && groupNames.indexOf(field.name) === -1) {
@@ -117,24 +117,24 @@
             });
 
             if (!anyChecked && group.length > 0) {
-                group[0].setCustomValidity('Bitte mindestens eine Option auswählen.');
+                group[0].setCustomValidity(messages.selectOne);
                 valid = false;
             }
         });
 
-        // Normale Pflichtfelder (Text, E-Mail, Auswahl etc.).
+        // Normal required fields (text, email, select etc.).
         allRequired.forEach(function (field) {
             if (isCheckboxOrRadio(field)) {
-                return; // oben schon als Gruppe behandelt
+                return; // already handled as a group above
             }
 
             if (field.value.trim() === '') {
-                field.setCustomValidity('Dieses Feld ist erforderlich.');
+                field.setCustomValidity(messages.required);
                 valid = false;
             }
         });
 
-        // E-Mail-Format: nutzt die native Browser-Prüfung für type=email.
+        // Email format: uses the browser's native validation for type=email.
         emailFields.forEach(function (field) {
             if (field.value.trim() !== '' && typeof field.checkValidity === 'function' && !field.checkValidity()) {
                 valid = false;
@@ -142,11 +142,11 @@
         });
 
         if (!valid) {
-            // Erzwingt einen echten Fokuswechsel, bevor die native
-            // Validierungs-Sprechblase angezeigt wird - manche Browser
-            // (v.a. Chrome) zeigen sie sonst nicht an, wenn das
-            // betroffene Feld schon vorher fokussiert war (z.B. weil
-            // Fluent Forms dem ersten Feld automatisch den Fokus gibt).
+            // Forces a real focus change before the native validation
+            // bubble is shown - some browsers (Chrome especially) won't
+            // show it otherwise if the affected field was already
+            // focused beforehand (e.g. because Fluent Forms
+            // auto-focuses the first field).
             var firstInvalid = form.querySelector(':invalid');
 
             if (firstInvalid && typeof firstInvalid.blur === 'function' && typeof firstInvalid.focus === 'function') {
@@ -166,11 +166,20 @@
         var scriptTag = document.querySelector('script[data-honeypot], script[src$="wpstatic-form-validate.js"]');
         var honeypotField = scriptTag ? (scriptTag.getAttribute('data-honeypot') || '') : '';
 
+        // Messages come from the server (see WPStatic_Forms::applyToGenerator())
+        // translated into whatever language the WordPress install is
+        // configured for - falls back to English if the script tag
+        // doesn't carry them (e.g. if this file is used standalone).
+        var messages = {
+            required: (scriptTag && scriptTag.getAttribute('data-msg-required')) || 'This field is required.',
+            selectOne: (scriptTag && scriptTag.getAttribute('data-msg-select-one')) || 'Please select at least one option.'
+        };
+
         document.querySelectorAll('form').forEach(function (form) {
             form.querySelectorAll('[aria-required="true"], input[type="email"]').forEach(attachLiveReset);
 
             form.addEventListener('submit', function (event) {
-                if (!validateForm(form)) {
+                if (!validateForm(form, messages)) {
                     event.preventDefault();
                     return;
                 }

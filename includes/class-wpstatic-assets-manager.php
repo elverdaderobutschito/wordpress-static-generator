@@ -68,13 +68,13 @@ class WPStatic_AssetsManager {
      */
     public static function extractZip(string $zipTmpPath): array {
         if (!extension_loaded('zip')) {
-            return ['ok' => false, 'message' => __('The PHP zip extension is not active.', 'wp-static-deploy'), 'warnings' => []];
+            return ['ok' => false, 'message' => __('The PHP zip extension is not active.', 'wordpress-static-generator'), 'warnings' => []];
         }
 
         $zip = new ZipArchive();
 
         if ($zip->open($zipTmpPath) !== true) {
-            return ['ok' => false, 'message' => __('The ZIP file could not be opened.', 'wp-static-deploy'), 'warnings' => []];
+            return ['ok' => false, 'message' => __('The ZIP file could not be opened.', 'wordpress-static-generator'), 'warnings' => []];
         }
 
         // Safety check: does the ZIP even contain an "assets/" root folder?
@@ -90,7 +90,7 @@ class WPStatic_AssetsManager {
             $zip->close();
             return [
                 'ok' => false,
-                'message' => __('The ZIP file does not contain an "assets/" folder as its root. Please zip the assets folder itself (not just its contents).', 'wp-static-deploy'),
+                'message' => __('The ZIP file does not contain an "assets/" folder as its root. Please zip the assets folder itself (not just its contents).', 'wordpress-static-generator'),
                 'warnings' => [],
             ];
         }
@@ -99,7 +99,7 @@ class WPStatic_AssetsManager {
 
         if (!wp_mkdir_p($stagingDir)) {
             $zip->close();
-            return ['ok' => false, 'message' => __('Could not create a temporary directory.', 'wp-static-deploy'), 'warnings' => []];
+            return ['ok' => false, 'message' => __('Could not create a temporary directory.', 'wordpress-static-generator'), 'warnings' => []];
         }
 
         $extracted = $zip->extractTo($stagingDir);
@@ -107,14 +107,14 @@ class WPStatic_AssetsManager {
 
         if (!$extracted) {
             self::rrmdir($stagingDir);
-            return ['ok' => false, 'message' => __('Extracting the ZIP file failed.', 'wp-static-deploy'), 'warnings' => []];
+            return ['ok' => false, 'message' => __('Extracting the ZIP file failed.', 'wordpress-static-generator'), 'warnings' => []];
         }
 
         $stagedAssetsDir = $stagingDir . '/assets';
 
         if (!is_dir($stagedAssetsDir)) {
             self::rrmdir($stagingDir);
-            return ['ok' => false, 'message' => __('No "assets/" folder found after extraction.', 'wp-static-deploy'), 'warnings' => []];
+            return ['ok' => false, 'message' => __('No "assets/" folder found after extraction.', 'wordpress-static-generator'), 'warnings' => []];
         }
 
         // Safety check: suspicious, potentially executable file types. Does
@@ -137,7 +137,7 @@ class WPStatic_AssetsManager {
         self::rrmdir($stagingDir); // clean up any ZIP extras (__MACOSX etc.)
 
         if (!$moved) {
-            return ['ok' => false, 'message' => __('Could not move assets to the target location.', 'wp-static-deploy'), 'warnings' => $warnings];
+            return ['ok' => false, 'message' => __('Could not move assets to the target location.', 'wordpress-static-generator'), 'warnings' => $warnings];
         }
 
         update_option('wpstatic_assets_updated_at', time(), false);
@@ -148,7 +148,7 @@ class WPStatic_AssetsManager {
         // SFTP target (see WPStatic_BatchController).
         update_option('wpstatic_assets_uploaded_targets', [], false);
 
-        return ['ok' => true, 'message' => __('Assets updated successfully.', 'wp-static-deploy'), 'warnings' => $warnings];
+        return ['ok' => true, 'message' => __('Assets updated successfully.', 'wordpress-static-generator'), 'warnings' => $warnings];
     }
 
     public static function copyToBuild(string $buildDir): void {

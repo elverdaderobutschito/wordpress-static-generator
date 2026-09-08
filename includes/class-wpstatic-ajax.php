@@ -23,7 +23,7 @@ class WPStatic_AjaxController {
         check_ajax_referer(self::NONCE_ACTION, 'nonce');
 
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(['message' => __('Insufficient permissions.', 'wp-static-deploy')], 403);
+            wp_send_json_error(['message' => __('Insufficient permissions.', 'wordpress-static-generator')], 403);
         }
     }
 
@@ -72,7 +72,7 @@ class WPStatic_AjaxController {
         $queue = get_transient($this->queueTransientKey());
 
         if (!is_array($queue)) {
-            wp_send_json_error(['message' => __('No deployment in progress found. Please start again.', 'wp-static-deploy')]);
+            wp_send_json_error(['message' => __('No deployment in progress found. Please start again.', 'wordpress-static-generator')]);
         }
 
         $slice = array_slice($queue, $offset, $batchSize);
@@ -124,7 +124,7 @@ class WPStatic_AjaxController {
         delete_transient($this->queueTransientKey());
         delete_transient($this->frontFileTransientKey());
 
-        $response = $upload['result'] ?: ['message' => __('Deployment complete.', 'wp-static-deploy')];
+        $response = $upload['result'] ?: ['message' => __('Deployment complete.', 'wordpress-static-generator')];
         $response['assets_included'] = $upload['assetsIncluded'];
 
         if (isset($upload['uploadStats'])) {
@@ -133,7 +133,7 @@ class WPStatic_AjaxController {
 
             $response['message'] = sprintf(
                 /* translators: 1: file count, 2: target path, 3: wp-content file count */
-                __('Deployment complete: %1$d files to "%2$s". Of these, %3$d under wp-content/ (e.g. images).', 'wp-static-deploy'),
+                __('Deployment complete: %1$d files to "%2$s". Of these, %3$d under wp-content/ (e.g. images).', 'wordpress-static-generator'),
                 $stats['total'],
                 $upload['remoteBasePath'] ?? '',
                 $wpContentCount
@@ -143,7 +143,7 @@ class WPStatic_AjaxController {
         }
 
         if ($upload['assetsSkipForced']) {
-            $response['message'] = ($response['message'] ?? '') . ' (' . __('Note: assets were uploaded anyway, since they had never been uploaded for this target before.', 'wp-static-deploy') . ')';
+            $response['message'] = ($response['message'] ?? '') . ' (' . __('Note: assets were uploaded anyway, since they had never been uploaded for this target before.', 'wordpress-static-generator') . ')';
         }
 
         wp_send_json_success($response);
@@ -160,11 +160,11 @@ class WPStatic_AjaxController {
         $post = $postId ? get_post($postId) : null;
 
         if (!$post) {
-            wp_send_json_error(['message' => __('Post not found.', 'wp-static-deploy')]);
+            wp_send_json_error(['message' => __('Post not found.', 'wordpress-static-generator')]);
         }
 
         if (!current_user_can('edit_post', $postId)) {
-            wp_send_json_error(['message' => __('Insufficient permissions for this post.', 'wp-static-deploy')], 403);
+            wp_send_json_error(['message' => __('Insufficient permissions for this post.', 'wordpress-static-generator')], 403);
         }
 
         $settings = WPStatic_Settings::getSettings();
@@ -206,7 +206,7 @@ class WPStatic_AjaxController {
                 WPStatic_BatchController::markAssetsUploadedForCurrentTarget();
 
                 wp_send_json_success(array_merge(
-                    ['message' => __('Netlify does not support single-page deploys - the entire site was rebuilt and redeployed.', 'wp-static-deploy')],
+                    ['message' => __('Netlify does not support single-page deploys - the entire site was rebuilt and redeployed.', 'wordpress-static-generator')],
                     $result
                 ));
             }
@@ -228,7 +228,7 @@ class WPStatic_AjaxController {
             }
 
             if (empty($newFiles)) {
-                wp_send_json_error(['message' => __('No new files were generated - please check the configuration.', 'wp-static-deploy')]);
+                wp_send_json_error(['message' => __('No new files were generated - please check the configuration.', 'wordpress-static-generator')]);
             }
 
             $uploader = WPStatic_BatchController::buildUploader();
@@ -239,7 +239,7 @@ class WPStatic_AjaxController {
             }
 
             wp_send_json_success([
-                'message' => __('Page deployed.', 'wp-static-deploy'),
+                'message' => __('Page deployed.', 'wordpress-static-generator'),
                 'files' => $newFiles,
             ]);
         } catch (Throwable $e) {
@@ -255,7 +255,7 @@ class WPStatic_AjaxController {
         $this->checkAccess();
 
         if (!WPStatic_AssetsManager::hasAssets()) {
-            wp_send_json_error(['message' => __('No assets set up - please upload an assets.zip first.', 'wp-static-deploy')]);
+            wp_send_json_error(['message' => __('No assets set up - please upload an assets.zip first.', 'wordpress-static-generator')]);
         }
 
         try {
@@ -264,7 +264,7 @@ class WPStatic_AjaxController {
             wp_send_json_error(['message' => $e->getMessage()]);
         }
 
-        wp_send_json_success($result ?: ['message' => __('Assets deployed.', 'wp-static-deploy')]);
+        wp_send_json_success($result ?: ['message' => __('Assets deployed.', 'wordpress-static-generator')]);
     }
 
     // -----------------------------------------------------------------
@@ -279,22 +279,21 @@ class WPStatic_AjaxController {
 
         $existing = WPStatic_Settings::getSettings();
 
+        $rawAuthMethod = sanitize_key(wp_unslash($_POST['sftp_auth_method'] ?? ''));
+        $rawPassword = wp_unslash($_POST['sftp_password'] ?? '');
+        $rawPrivateKey = wp_unslash($_POST['sftp_private_key'] ?? '');
+        $rawPassphrase = wp_unslash($_POST['sftp_passphrase'] ?? '');
+
         $settings = [
             'sftp_host' => sanitize_text_field(wp_unslash($_POST['sftp_host'] ?? '')),
-            'sftp_port' => max(1, (int) ($_POST['sftp_port'] ?? 22)),
+            'sftp_port' => max(1, (int) wp_unslash($_POST['sftp_port'] ?? 22)),
             'sftp_username' => sanitize_text_field(wp_unslash($_POST['sftp_username'] ?? '')),
-            'sftp_auth_method' => in_array($_POST['sftp_auth_method'] ?? '', ['password', 'key'], true)
-                ? $_POST['sftp_auth_method']
+            'sftp_auth_method' => in_array($rawAuthMethod, ['password', 'key'], true)
+                ? $rawAuthMethod
                 : $existing['sftp_auth_method'],
-            'sftp_password' => ($_POST['sftp_password'] ?? '') !== ''
-                ? wp_unslash($_POST['sftp_password'])
-                : $existing['sftp_password'],
-            'sftp_private_key' => ($_POST['sftp_private_key'] ?? '') !== ''
-                ? wp_unslash($_POST['sftp_private_key'])
-                : $existing['sftp_private_key'],
-            'sftp_passphrase' => ($_POST['sftp_passphrase'] ?? '') !== ''
-                ? wp_unslash($_POST['sftp_passphrase'])
-                : $existing['sftp_passphrase'],
+            'sftp_password' => $rawPassword !== '' ? $rawPassword : $existing['sftp_password'],
+            'sftp_private_key' => $rawPrivateKey !== '' ? $rawPrivateKey : $existing['sftp_private_key'],
+            'sftp_passphrase' => $rawPassphrase !== '' ? $rawPassphrase : $existing['sftp_passphrase'],
             'sftp_remote_base_path' => '/' . ltrim(sanitize_text_field(wp_unslash($_POST['sftp_remote_base_path'] ?? '/')), '/'),
         ];
 
@@ -305,7 +304,7 @@ class WPStatic_AjaxController {
             wp_send_json_error(['message' => $e->getMessage()]);
         }
 
-        wp_send_json_success(['message' => __('Connection successful, target directory is writable.', 'wp-static-deploy')]);
+        wp_send_json_success(['message' => __('Connection successful, target directory is writable.', 'wordpress-static-generator')]);
     }
 
     public function handleTestNetlify(): void {
@@ -313,11 +312,11 @@ class WPStatic_AjaxController {
 
         $existing = WPStatic_Settings::getSettings();
 
+        $rawToken = wp_unslash($_POST['netlify_token'] ?? '');
+
         $settings = [
             'netlify_site_id' => sanitize_text_field(wp_unslash($_POST['netlify_site_id'] ?? '')),
-            'netlify_token' => ($_POST['netlify_token'] ?? '') !== ''
-                ? wp_unslash($_POST['netlify_token'])
-                : $existing['netlify_token'],
+            'netlify_token' => $rawToken !== '' ? $rawToken : $existing['netlify_token'],
         ];
 
         try {
@@ -327,6 +326,6 @@ class WPStatic_AjaxController {
             wp_send_json_error(['message' => $e->getMessage()]);
         }
 
-        wp_send_json_success(['message' => __('Connection successful, site found.', 'wp-static-deploy')]);
+        wp_send_json_success(['message' => __('Connection successful, site found.', 'wordpress-static-generator')]);
     }
 }

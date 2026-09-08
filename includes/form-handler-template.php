@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Auto-generated form handler (WP Static Deploy plugin).
+ * Auto-generated form handler (WordPress Static Generator plugin).
  *
  * IMPORTANT: This file is regenerated in the build directory on every
  * "Deploy all" run (the placeholders below are replaced with the

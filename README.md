@@ -1,4 +1,4 @@
-# WP Static Deploy
+# WordPress Static Generator
 
 Generates static HTML files from WordPress content (posts/pages) using
 `WPHeadlessStaticGenerator.php` - directly, internally, via
@@ -31,7 +31,7 @@ directory structure (permalink paths) defined in WordPress.
    Without this constant, the plugin still works (with an automatically
    generated key stored in the database), but that's weaker.
 
-4. Upload the plugin folder to `wp-content/plugins/wp-static-deploy/` and
+4. Upload the plugin folder to `wp-content/plugins/wordpress-static-generator/` and
    activate it in WordPress.
 
 5. Configure under **Static Deploy** (its own menu item):
@@ -212,4 +212,3 @@ the template already has one of its own.
   inside it.
 - `vendor/paragonie/constant_time_encoding` - MIT license, see the
   `LICENSE.txt` file inside it.
-# wordpress-static-generator

@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Auto-generated form handler (WordPress Static Generator plugin).
+ * Auto-generated form handler (Content2HTML plugin).
  *
  * IMPORTANT: This file is regenerated in the build directory on every
  * "Deploy all" run (the placeholders below are replaced with the
  * configured values) - manual changes made directly to the uploaded
  * version are lost on the next run. Adjustments belong in the plugin
- * settings (Static Deploy -> Forms), or, if needed, in this template
+ * settings (Content2HTML -> Forms), or, if needed, in this template
  * (includes/form-handler-template.php).
  *
  * How it works: accepts a POST request from one of the generated HTML

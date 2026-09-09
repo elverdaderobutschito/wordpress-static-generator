@@ -17,7 +17,7 @@ class WPStatic_NetlifyUploader implements WPStatic_Uploader {
 
     public function __construct(array $settings) {
         if (empty($settings['netlify_site_id']) || empty($settings['netlify_token'])) {
-            throw new RuntimeException(__('Netlify Site ID or token is missing from the settings.', 'wordpress-static-generator'));
+            throw new RuntimeException(__('Netlify Site ID or token is missing from the settings.', 'content2html'));
         }
 
         $this->siteId = $settings['netlify_site_id'];
@@ -55,28 +55,28 @@ class WPStatic_NetlifyUploader implements WPStatic_Uploader {
         if ($response === false) {
             $error = curl_error($curl);
             self::closeCurlHandle($curl);
-            throw new RuntimeException(sprintf(/* translators: %s: cURL error message */ __('Could not reach Netlify: %s', 'wordpress-static-generator'), $error));
+            throw new RuntimeException(sprintf(/* translators: %s: cURL error message */ __('Could not reach Netlify: %s', 'content2html'), $error));
         }
 
         $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         self::closeCurlHandle($curl);
 
         if ($httpCode === 401) {
-            throw new RuntimeException(__('Netlify token invalid or expired. Please enter a new Personal Access Token.', 'wordpress-static-generator'));
+            throw new RuntimeException(__('Netlify token invalid or expired. Please enter a new Personal Access Token.', 'content2html'));
         }
 
         if ($httpCode === 404) {
-            throw new RuntimeException(sprintf(/* translators: %s: Netlify site ID */ __('No Netlify site found with the ID "%s". Please check the site ID (found under Site settings -> General -> Site details in Netlify).', 'wordpress-static-generator'), $this->siteId));
+            throw new RuntimeException(sprintf(/* translators: %s: Netlify site ID */ __('No Netlify site found with the ID "%s". Please check the site ID (found under Site settings -> General -> Site details in Netlify).', 'content2html'), $this->siteId));
         }
 
         if ($httpCode < 200 || $httpCode >= 300) {
-            throw new RuntimeException(sprintf(/* translators: %d: HTTP status code */ __('Netlify responded with HTTP %d.', 'wordpress-static-generator'), $httpCode));
+            throw new RuntimeException(sprintf(/* translators: %d: HTTP status code */ __('Netlify responded with HTTP %d.', 'content2html'), $httpCode));
         }
 
         $decoded = json_decode((string) $response, true);
 
         if (!is_array($decoded) || ($decoded['id'] ?? null) !== $this->siteId) {
-            throw new RuntimeException(__('Unexpected response from Netlify - please check the site ID.', 'wordpress-static-generator'));
+            throw new RuntimeException(__('Unexpected response from Netlify - please check the site ID.', 'content2html'));
         }
     }
 
@@ -86,7 +86,7 @@ class WPStatic_NetlifyUploader implements WPStatic_Uploader {
         // always call uploadDirectory() on the entire build directory for
         // Netlify.
         throw new RuntimeException(
-            __('Netlify does not support single-file transfer - please use uploadDirectory().', 'wordpress-static-generator')
+            __('Netlify does not support single-file transfer - please use uploadDirectory().', 'content2html')
         );
     }
 
@@ -94,7 +94,7 @@ class WPStatic_NetlifyUploader implements WPStatic_Uploader {
         $zipPath = rtrim($localDir, '/') . '.zip';
 
         if (!$this->zipDirectory($localDir, $zipPath)) {
-            throw new RuntimeException(__('Could not zip the build directory for the Netlify deploy.', 'wordpress-static-generator'));
+            throw new RuntimeException(__('Could not zip the build directory for the Netlify deploy.', 'content2html'));
         }
 
         try {
@@ -110,7 +110,7 @@ class WPStatic_NetlifyUploader implements WPStatic_Uploader {
         $zipData = file_get_contents($zipPath);
 
         if ($zipData === false) {
-            throw new RuntimeException(__('Could not read the ZIP file for the Netlify deploy.', 'wordpress-static-generator'));
+            throw new RuntimeException(__('Could not read the ZIP file for the Netlify deploy.', 'content2html'));
         }
 
         $curl = curl_init("https://api.netlify.com/api/v1/sites/{$this->siteId}/deploys");
@@ -131,7 +131,7 @@ class WPStatic_NetlifyUploader implements WPStatic_Uploader {
         if ($response === false) {
             $error = curl_error($curl);
             self::closeCurlHandle($curl);
-            throw new RuntimeException(sprintf(/* translators: %s: cURL error message */ __('Netlify deploy failed: %s', 'wordpress-static-generator'), $error));
+            throw new RuntimeException(sprintf(/* translators: %s: cURL error message */ __('Netlify deploy failed: %s', 'content2html'), $error));
         }
 
         $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
@@ -140,7 +140,7 @@ class WPStatic_NetlifyUploader implements WPStatic_Uploader {
         $decoded = json_decode($response, true);
 
         if ($httpCode < 200 || $httpCode >= 300 || !is_array($decoded)) {
-            throw new RuntimeException(sprintf(/* translators: 1: HTTP status code, 2: response body excerpt */ __('Netlify responded with HTTP %1$d: %2$s', 'wordpress-static-generator'), $httpCode, substr((string) $response, 0, 500)));
+            throw new RuntimeException(sprintf(/* translators: 1: HTTP status code, 2: response body excerpt */ __('Netlify responded with HTTP %1$d: %2$s', 'content2html'), $httpCode, substr((string) $response, 0, 500)));
         }
 
         return [

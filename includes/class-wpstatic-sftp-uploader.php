@@ -19,12 +19,12 @@ class WPStatic_SftpUploader implements WPStatic_Uploader {
     public function __construct(array $settings) {
         if (!class_exists(\phpseclib3\Net\SFTP::class)) {
             throw new RuntimeException(
-                __('phpseclib3 was not found. Please run "composer install" in the plugin directory (see README.md) or upload the vendor folder manually.', 'wordpress-static-generator')
+                __('phpseclib3 was not found. Please run "composer install" in the plugin directory (see README.md) or upload the vendor folder manually.', 'content2html')
             );
         }
 
         if (trim($settings['sftp_host']) === '') {
-            throw new RuntimeException(__('No host specified.', 'wordpress-static-generator'));
+            throw new RuntimeException(__('No host specified.', 'content2html'));
         }
 
         $this->remoteBasePath = '/' . trim($settings['sftp_remote_base_path'], '/');
@@ -42,7 +42,7 @@ class WPStatic_SftpUploader implements WPStatic_Uploader {
                 throw new RuntimeException(
                     sprintf(
                         /* translators: 1: host, 2: port */
-                        __('Could not connect to %1$s:%2$s. Please check host, port and firewall/network.', 'wordpress-static-generator'),
+                        __('Could not connect to %1$s:%2$s. Please check host, port and firewall/network.', 'content2html'),
                         $settings['sftp_host'],
                         $settings['sftp_port']
                     )
@@ -50,8 +50,8 @@ class WPStatic_SftpUploader implements WPStatic_Uploader {
             }
 
             throw new RuntimeException(
-                __('Connected to the server, but login failed. Please check the username and', 'wordpress-static-generator') . ' '
-                . ($settings['sftp_auth_method'] === 'key' ? __('private key/passphrase', 'wordpress-static-generator') : __('password', 'wordpress-static-generator')) . '.'
+                __('Connected to the server, but login failed. Please check the username and', 'content2html') . ' '
+                . ($settings['sftp_auth_method'] === 'key' ? __('private key/passphrase', 'content2html') : __('password', 'content2html')) . '.'
             );
         }
     }
@@ -79,7 +79,7 @@ class WPStatic_SftpUploader implements WPStatic_Uploader {
             throw new RuntimeException(
                 sprintf(
                     /* translators: %s: target directory path */
-                    __('Target directory "%s" could not be created/found. Please check the path and permissions of the SFTP user.', 'wordpress-static-generator'),
+                    __('Target directory "%s" could not be created/found. Please check the path and permissions of the SFTP user.', 'content2html'),
                     $this->remoteBasePath
                 )
             );
@@ -89,7 +89,7 @@ class WPStatic_SftpUploader implements WPStatic_Uploader {
             throw new RuntimeException(
                 sprintf(
                     /* translators: %s: target directory path */
-                    __('"%s" exists, but is not a directory. Please check the path.', 'wordpress-static-generator'),
+                    __('"%s" exists, but is not a directory. Please check the path.', 'content2html'),
                     $this->remoteBasePath
                 )
             );
@@ -97,11 +97,11 @@ class WPStatic_SftpUploader implements WPStatic_Uploader {
 
         $testFile = rtrim($this->remoteBasePath, '/') . '/.wpstatic-connection-test-' . uniqid();
 
-        if (!$this->sftp->put($testFile, 'wordpress-static-generator connection test', \phpseclib3\Net\SFTP::SOURCE_STRING)) {
+        if (!$this->sftp->put($testFile, 'content2html connection test', \phpseclib3\Net\SFTP::SOURCE_STRING)) {
             throw new RuntimeException(
                 sprintf(
                     /* translators: 1: target directory path, 2: SFTP error */
-                    __('Connection/login successful, but "%1$s" is not writable (%2$s). Please check the directory permissions for the SFTP user.', 'wordpress-static-generator'),
+                    __('Connection/login successful, but "%1$s" is not writable (%2$s). Please check the directory permissions for the SFTP user.', 'content2html'),
                     $this->remoteBasePath,
                     $this->sftp->getLastSFTPError()
                 )
@@ -123,7 +123,7 @@ class WPStatic_SftpUploader implements WPStatic_Uploader {
             throw new RuntimeException(
                 sprintf(
                     /* translators: 1: relative file path, 2: SFTP error */
-                    __('Could not transfer file via SFTP: %1$s (%2$s)', 'wordpress-static-generator'),
+                    __('Could not transfer file via SFTP: %1$s (%2$s)', 'content2html'),
                     $relativePath,
                     $this->sftp->getLastSFTPError()
                 )

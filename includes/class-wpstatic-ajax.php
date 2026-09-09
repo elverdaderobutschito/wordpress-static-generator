@@ -23,7 +23,7 @@ class WPStatic_AjaxController {
         check_ajax_referer(self::NONCE_ACTION, 'nonce');
 
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(['message' => __('Insufficient permissions.', 'wordpress-static-generator')], 403);
+            wp_send_json_error(['message' => __('Insufficient permissions.', 'content2html')], 403);
         }
     }
 
@@ -72,7 +72,7 @@ class WPStatic_AjaxController {
         $queue = get_transient($this->queueTransientKey());
 
         if (!is_array($queue)) {
-            wp_send_json_error(['message' => __('No deployment in progress found. Please start again.', 'wordpress-static-generator')]);
+            wp_send_json_error(['message' => __('No deployment in progress found. Please start again.', 'content2html')]);
         }
 
         $slice = array_slice($queue, $offset, $batchSize);
@@ -124,7 +124,7 @@ class WPStatic_AjaxController {
         delete_transient($this->queueTransientKey());
         delete_transient($this->frontFileTransientKey());
 
-        $response = $upload['result'] ?: ['message' => __('Deployment complete.', 'wordpress-static-generator')];
+        $response = $upload['result'] ?: ['message' => __('Deployment complete.', 'content2html')];
         $response['assets_included'] = $upload['assetsIncluded'];
 
         if (isset($upload['uploadStats'])) {
@@ -133,7 +133,7 @@ class WPStatic_AjaxController {
 
             $response['message'] = sprintf(
                 /* translators: 1: file count, 2: target path, 3: wp-content file count */
-                __('Deployment complete: %1$d files to "%2$s". Of these, %3$d under wp-content/ (e.g. images).', 'wordpress-static-generator'),
+                __('Deployment complete: %1$d files to "%2$s". Of these, %3$d under wp-content/ (e.g. images).', 'content2html'),
                 $stats['total'],
                 $upload['remoteBasePath'] ?? '',
                 $wpContentCount
@@ -143,7 +143,7 @@ class WPStatic_AjaxController {
         }
 
         if ($upload['assetsSkipForced']) {
-            $response['message'] = ($response['message'] ?? '') . ' (' . __('Note: assets were uploaded anyway, since they had never been uploaded for this target before.', 'wordpress-static-generator') . ')';
+            $response['message'] = ($response['message'] ?? '') . ' (' . __('Note: assets were uploaded anyway, since they had never been uploaded for this target before.', 'content2html') . ')';
         }
 
         wp_send_json_success($response);
@@ -160,11 +160,11 @@ class WPStatic_AjaxController {
         $post = $postId ? get_post($postId) : null;
 
         if (!$post) {
-            wp_send_json_error(['message' => __('Post not found.', 'wordpress-static-generator')]);
+            wp_send_json_error(['message' => __('Post not found.', 'content2html')]);
         }
 
         if (!current_user_can('edit_post', $postId)) {
-            wp_send_json_error(['message' => __('Insufficient permissions for this post.', 'wordpress-static-generator')], 403);
+            wp_send_json_error(['message' => __('Insufficient permissions for this post.', 'content2html')], 403);
         }
 
         $settings = WPStatic_Settings::getSettings();
@@ -206,7 +206,7 @@ class WPStatic_AjaxController {
                 WPStatic_BatchController::markAssetsUploadedForCurrentTarget();
 
                 wp_send_json_success(array_merge(
-                    ['message' => __('Netlify does not support single-page deploys - the entire site was rebuilt and redeployed.', 'wordpress-static-generator')],
+                    ['message' => __('Netlify does not support single-page deploys - the entire site was rebuilt and redeployed.', 'content2html')],
                     $result
                 ));
             }
@@ -228,7 +228,7 @@ class WPStatic_AjaxController {
             }
 
             if (empty($newFiles)) {
-                wp_send_json_error(['message' => __('No new files were generated - please check the configuration.', 'wordpress-static-generator')]);
+                wp_send_json_error(['message' => __('No new files were generated - please check the configuration.', 'content2html')]);
             }
 
             $uploader = WPStatic_BatchController::buildUploader();
@@ -239,7 +239,7 @@ class WPStatic_AjaxController {
             }
 
             wp_send_json_success([
-                'message' => __('Page deployed.', 'wordpress-static-generator'),
+                'message' => __('Page deployed.', 'content2html'),
                 'files' => $newFiles,
             ]);
         } catch (Throwable $e) {
@@ -255,7 +255,7 @@ class WPStatic_AjaxController {
         $this->checkAccess();
 
         if (!WPStatic_AssetsManager::hasAssets()) {
-            wp_send_json_error(['message' => __('No assets set up - please upload an assets.zip first.', 'wordpress-static-generator')]);
+            wp_send_json_error(['message' => __('No assets set up - please upload an assets.zip first.', 'content2html')]);
         }
 
         try {
@@ -264,7 +264,7 @@ class WPStatic_AjaxController {
             wp_send_json_error(['message' => $e->getMessage()]);
         }
 
-        wp_send_json_success($result ?: ['message' => __('Assets deployed.', 'wordpress-static-generator')]);
+        wp_send_json_success($result ?: ['message' => __('Assets deployed.', 'content2html')]);
     }
 
     // -----------------------------------------------------------------
@@ -304,7 +304,7 @@ class WPStatic_AjaxController {
             wp_send_json_error(['message' => $e->getMessage()]);
         }
 
-        wp_send_json_success(['message' => __('Connection successful, target directory is writable.', 'wordpress-static-generator')]);
+        wp_send_json_success(['message' => __('Connection successful, target directory is writable.', 'content2html')]);
     }
 
     public function handleTestNetlify(): void {
@@ -326,6 +326,6 @@ class WPStatic_AjaxController {
             wp_send_json_error(['message' => $e->getMessage()]);
         }
 
-        wp_send_json_success(['message' => __('Connection successful, site found.', 'wordpress-static-generator')]);
+        wp_send_json_success(['message' => __('Connection successful, site found.', 'content2html')]);
     }
 }

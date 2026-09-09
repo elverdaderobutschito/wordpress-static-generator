@@ -1,15 +1,16 @@
 <?php
 /**
- * Plugin Name: WordPress Static Generator
- * Plugin URI: https://wordpress-static-generator.com
- * Description: Turns your WordPress content into a static HTML site and deploys it to Netlify or any SFTP host - forms, navigation, and Markdown export included.
+ * Plugin Name: Content2HTML
+ * Plugin URI: https://ub-internetberatung.de
+ * Description: Use WordPress as a headless CMS without building a WordPress theme. Upload your HTML template, define your own injection points, and publish the result as a static website.
  * Version: 1.0.0
  * Requires at least: 6.0
  * Requires PHP: 7.4
- * Author: Butsch
+ * Author: elbutschito
+ * Author URI: https://profiles.wordpress.org/elbutschito/
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: wordpress-static-generator
+ * Text Domain: content2html
  * Domain Path: /languages
  *
  * INSTALLATION / DEPENDENCIES:
@@ -30,7 +31,7 @@ define('WPSTATIC_DEPLOY_DIR', plugin_dir_path(__FILE__));
 define('WPSTATIC_DEPLOY_URL', plugin_dir_url(__FILE__));
 
 add_action('plugins_loaded', function () {
-    load_plugin_textdomain('wordpress-static-generator', false, dirname(plugin_basename(__FILE__)) . '/languages');
+    load_plugin_textdomain('content2html', false, dirname(plugin_basename(__FILE__)) . '/languages');
 });
 
 // -----------------------------------------------------------------------
@@ -43,7 +44,7 @@ add_action('plugins_loaded', function () {
 
 if (version_compare(PHP_VERSION, '7.4', '<')) {
     add_action('admin_notices', function () {
-        echo '<div class="notice notice-error"><p>' . esc_html__('WordPress Static Generator requires PHP 7.4 or newer.', 'wordpress-static-generator') . '</p></div>';
+        echo '<div class="notice notice-error"><p>' . esc_html__('Content2HTML requires PHP 7.4 or newer.', 'content2html') . '</p></div>';
     });
     return;
 }
@@ -52,7 +53,7 @@ if (!file_exists(WPSTATIC_DEPLOY_DIR . 'lib/simple_html_dom.php')) {
     add_action('admin_notices', function () {
         echo '<div class="notice notice-error"><p>'
             /* translators: %s: file path */
-            . sprintf(esc_html__('WordPress Static Generator: %s is missing. See lib/README-simple-html-dom.txt.', 'wordpress-static-generator'), '<code>lib/simple_html_dom.php</code>')
+            . sprintf(esc_html__('Content2HTML: %s is missing. See lib/README-simple-html-dom.txt.', 'content2html'), '<code>lib/simple_html_dom.php</code>')
             . '</p></div>';
     });
     return;

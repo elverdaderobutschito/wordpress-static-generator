@@ -42,8 +42,8 @@ class WPStatic_Forms {
         // the site's actual audience.
         $validationScriptPath = '/' . self::VALIDATION_SCRIPT_FILENAME;
         $validationMessages = [
-            'validation_msg_required' => __('This field is required.', 'wordpress-static-generator'),
-            'validation_msg_select_one' => __('Please select at least one option.', 'wordpress-static-generator'),
+            'validation_msg_required' => __('This field is required.', 'content2html'),
+            'validation_msg_select_one' => __('Please select at least one option.', 'content2html'),
         ];
 
         if ($settings['target'] === 'netlify') {

@@ -809,7 +809,7 @@ class WPHeadlessStaticGenerator {
         if ($decoded === null && json_last_error() !== JSON_ERROR_NONE) {
             throw new WPApiException(sprintf(
                 /* translators: 1: request URL, 2: JSON error message */
-                __('WP API did not return valid JSON (%1$s): %2$s', 'wordpress-static-generator'),
+                __('WP API did not return valid JSON (%1$s): %2$s', 'content2html'),
                 $url,
                 json_last_error_msg()
             ));

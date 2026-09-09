@@ -126,8 +126,8 @@ class WPStatic_Settings {
 
     public function registerMenu(): void {
         add_menu_page(
-            'Static Deploy',
-            'Static Deploy',
+            __('Content2HTML', 'content2html'),
+            __('Content2HTML', 'content2html'),
             'manage_options',
             'wpstatic-deploy',
             [$this, 'renderPage'],
@@ -149,37 +149,37 @@ class WPStatic_Settings {
             'nonce' => wp_create_nonce('wpstatic_deploy_ajax'),
             'batchSize' => 5,
             'i18n' => [
-                'testConnection' => __('Test connection', 'wordpress-static-generator'),
-                'deployingToTarget' => __('Deploying to target …', 'wordpress-static-generator'),
-                'deployAll' => __('Deploy all', 'wordpress-static-generator'),
-                'running' => __('Running …', 'wordpress-static-generator'),
-                'deployingAssets' => __('Deploying assets …', 'wordpress-static-generator'),
-                'deployAssetsOnly' => __('Deploy assets only', 'wordpress-static-generator'),
-                'unsavedChangesConfirm' => __('You have unsaved changes in the settings.', 'wordpress-static-generator') . "\n\n"
+                'testConnection' => __('Test connection', 'content2html'),
+                'deployingToTarget' => __('Deploying to target …', 'content2html'),
+                'deployAll' => __('Deploy all', 'content2html'),
+                'running' => __('Running …', 'content2html'),
+                'deployingAssets' => __('Deploying assets …', 'content2html'),
+                'deployAssetsOnly' => __('Deploy assets only', 'content2html'),
+                'unsavedChangesConfirm' => __('You have unsaved changes in the settings.', 'content2html') . "\n\n"
                     /* translators: %s: name of the action button being confirmed, e.g. "Deploy all" */
-                    . __('"%s" uses the last SAVED settings, not your current input.', 'wordpress-static-generator') . "\n\n"
-                    . __('Continue anyway?', 'wordpress-static-generator'),
-                'unknownError' => __('Unknown error', 'wordpress-static-generator'),
-                'unknownErrorPeriod' => __('Unknown error.', 'wordpress-static-generator'),
-                'errorPrefix' => __('Error:', 'wordpress-static-generator'),
-                'errorRequestFailed' => __('Error processing the request.', 'wordpress-static-generator'),
-                'starting' => __('Starting …', 'wordpress-static-generator'),
-                'noMatchingPosts' => __('No matching posts/pages found.', 'wordpress-static-generator'),
-                'errorStartingDeploy' => __('Error starting the deployment.', 'wordpress-static-generator'),
-                'errorBatchProcessing' => __('Error during batch processing.', 'wordpress-static-generator'),
-                'errorFinalizing' => __('Error during final upload.', 'wordpress-static-generator'),
-                'assetsDeployedWithUrl' => __('Assets deployed. Deploy:', 'wordpress-static-generator'),
-                'assetsDeployed' => __('Assets deployed.', 'wordpress-static-generator'),
-                'deploymentComplete' => __('Deployment complete.', 'wordpress-static-generator'),
-                'testing' => __('Testing …', 'wordpress-static-generator'),
-                'requestToWordPressFailed' => __('Request to WordPress failed.', 'wordpress-static-generator'),
+                    . __('"%s" uses the last SAVED settings, not your current input.', 'content2html') . "\n\n"
+                    . __('Continue anyway?', 'content2html'),
+                'unknownError' => __('Unknown error', 'content2html'),
+                'unknownErrorPeriod' => __('Unknown error.', 'content2html'),
+                'errorPrefix' => __('Error:', 'content2html'),
+                'errorRequestFailed' => __('Error processing the request.', 'content2html'),
+                'starting' => __('Starting …', 'content2html'),
+                'noMatchingPosts' => __('No matching posts/pages found.', 'content2html'),
+                'errorStartingDeploy' => __('Error starting the deployment.', 'content2html'),
+                'errorBatchProcessing' => __('Error during batch processing.', 'content2html'),
+                'errorFinalizing' => __('Error during final upload.', 'content2html'),
+                'assetsDeployedWithUrl' => __('Assets deployed. Deploy:', 'content2html'),
+                'assetsDeployed' => __('Assets deployed.', 'content2html'),
+                'deploymentComplete' => __('Deployment complete.', 'content2html'),
+                'testing' => __('Testing …', 'content2html'),
+                'requestToWordPressFailed' => __('Request to WordPress failed.', 'content2html'),
             ],
         ]);
     }
 
     public function handleSave(): void {
         if (!current_user_can('manage_options')) {
-            wp_die(esc_html__('Insufficient permissions.', 'wordpress-static-generator'));
+            wp_die(esc_html__('Insufficient permissions.', 'content2html'));
         }
 
         check_admin_referer(self::NONCE_ACTION);
@@ -253,7 +253,7 @@ class WPStatic_Settings {
             if (isset($uploaded['file'])) {
                 $newValues['template_path'] = $uploaded['file'];
             } else {
-                set_transient('wpstatic_template_upload_error', $uploaded['error'] ?? __('Unknown error while uploading the default template.', 'wordpress-static-generator'), MINUTE_IN_SECONDS * 5);
+                set_transient('wpstatic_template_upload_error', $uploaded['error'] ?? __('Unknown error while uploading the default template.', 'content2html'), MINUTE_IN_SECONDS * 5);
             }
         } elseif (!empty($_POST['template_path_existing'])) {
             $newValues['template_path'] = sanitize_text_field(wp_unslash($_POST['template_path_existing']));
@@ -290,18 +290,18 @@ class WPStatic_Settings {
                         'path' => $uploadedTemplate['file'],
                     ];
                 } else {
-                    set_transient('wpstatic_template_upload_error', $uploadedTemplate['error'] ?? __('Unknown error while uploading.', 'wordpress-static-generator'), MINUTE_IN_SECONDS * 5);
+                    set_transient('wpstatic_template_upload_error', $uploadedTemplate['error'] ?? __('Unknown error while uploading.', 'content2html'), MINUTE_IN_SECONDS * 5);
                 }
             } elseif (isset($_FILES['new_template_file']) && $_FILES['new_template_file']['error'] !== UPLOAD_ERR_NO_FILE) {
                 set_transient('wpstatic_template_upload_error', self::uploadErrorMessage((int) $_FILES['new_template_file']['error']), MINUTE_IN_SECONDS * 5);
             } else {
-                set_transient('wpstatic_template_upload_error', __('A name for the new template was given, but no file was selected.', 'wordpress-static-generator'), MINUTE_IN_SECONDS * 5);
+                set_transient('wpstatic_template_upload_error', __('A name for the new template was given, but no file was selected.', 'content2html'), MINUTE_IN_SECONDS * 5);
             }
         } elseif (!empty($_FILES['new_template_file']['tmp_name'])) {
             // A common user error (the exact one we ran into ourselves):
             // a file was selected, but no name was given - previously
             // ignored silently, now with a clear message.
-            set_transient('wpstatic_template_upload_error', __('Please enter a name for the new template (required) - the file was therefore not saved.', 'wordpress-static-generator'), MINUTE_IN_SECONDS * 5);
+            set_transient('wpstatic_template_upload_error', __('Please enter a name for the new template (required) - the file was therefore not saved.', 'content2html'), MINUTE_IN_SECONDS * 5);
         }
 
         $newValues['extra_templates'] = $keepTemplates;
@@ -322,7 +322,7 @@ class WPStatic_Settings {
         if ($newValues['forms_enabled'] === 'on' && $newValues['target'] === 'sftp' && $newValues['form_recipient_email'] === '') {
             set_transient(
                 'wpstatic_forms_warning',
-                __('Forms are enabled, but no recipient email address has been set - the form handler will reject incoming submissions until this is fixed.', 'wordpress-static-generator'),
+                __('Forms are enabled, but no recipient email address has been set - the form handler will reject incoming submissions until this is fixed.', 'content2html'),
                 MINUTE_IN_SECONDS * 5
             );
         }
@@ -340,7 +340,7 @@ class WPStatic_Settings {
                     'wpstatic_forms_warning',
                     sprintf(
                         /* translators: %s: hostname */
-                        __('The form "thank you" page points to your WordPress domain (%s). With Netlify as the target, the form would then submit DIRECTLY to WordPress instead of Netlify - the submission would never show up in Netlify\'s Forms overview. Please leave it empty or enter a relative address on the Netlify site itself (e.g. /thank-you/).', 'wordpress-static-generator'),
+                        __('The form "thank you" page points to your WordPress domain (%s). With Netlify as the target, the form would then submit DIRECTLY to WordPress instead of Netlify - the submission would never show up in Netlify\'s Forms overview. Please leave it empty or enter a relative address on the Netlify site itself (e.g. /thank-you/).', 'content2html'),
                         $redirectHost
                     ),
                     MINUTE_IN_SECONDS * 5
@@ -372,7 +372,7 @@ class WPStatic_Settings {
                 'ok' => false,
                 'message' => sprintf(
                     /* translators: %s: post_max_size ini value */
-                    __('The request exceeds the server limit post_max_size (currently: %s). The file is too large to upload in this form.', 'wordpress-static-generator'),
+                    __('The request exceeds the server limit post_max_size (currently: %s). The file is too large to upload in this form.', 'content2html'),
                     ini_get('post_max_size')
                 ),
                 'warnings' => [],
@@ -402,7 +402,7 @@ class WPStatic_Settings {
 
     public function handleMarkdownExport(): void {
         if (!current_user_can('manage_options')) {
-            wp_die(esc_html__('Insufficient permissions.', 'wordpress-static-generator'));
+            wp_die(esc_html__('Insufficient permissions.', 'content2html'));
         }
 
         check_admin_referer('wpstatic_export_markdown');
@@ -413,11 +413,11 @@ class WPStatic_Settings {
         try {
             $zipPath = WPStatic_MarkdownExport::buildZip($settings, $localizeImages);
         } catch (Throwable $e) {
-            wp_die(esc_html__('Export failed:', 'wordpress-static-generator') . ' ' . esc_html($e->getMessage()));
+            wp_die(esc_html__('Export failed:', 'content2html') . ' ' . esc_html($e->getMessage()));
         }
 
         if (!is_file($zipPath)) {
-            wp_die(esc_html__('Export failed: the ZIP file was not created.', 'wordpress-static-generator'));
+            wp_die(esc_html__('Export failed: the ZIP file was not created.', 'content2html'));
         }
 
         $downloadName = 'markdown-export-' . date('Ymd_His') . '.zip';
@@ -441,19 +441,19 @@ class WPStatic_Settings {
         <h3><?php echo esc_html($label); ?></h3>
         <table class="form-table wpstatic-nav-fields" data-prefix="<?php echo esc_attr($prefix); ?>">
             <tr>
-                <th><?php esc_html_e('Generate automatically', 'wordpress-static-generator'); ?></th>
+                <th><?php esc_html_e('Generate automatically', 'content2html'); ?></th>
                 <td>
                     <label>
                         <input type="checkbox" class="wpstatic-nav-enabled" name="<?php echo esc_attr($prefix); ?>enabled" <?php checked('on', $settings[$prefix . 'enabled']); ?>>
-                        <?php esc_html_e('Replace navigation markers in the template with real menu items', 'wordpress-static-generator'); ?>
+                        <?php esc_html_e('Replace navigation markers in the template with real menu items', 'content2html'); ?>
                     </label>
                 </td>
             </tr>
             <tr class="wpstatic-nav-detail">
-                <th><label for="<?php echo esc_attr($prefix); ?>menu_id"><?php esc_html_e('WordPress menu', 'wordpress-static-generator'); ?></label></th>
+                <th><label for="<?php echo esc_attr($prefix); ?>menu_id"><?php esc_html_e('WordPress menu', 'content2html'); ?></label></th>
                 <td>
                     <select id="<?php echo esc_attr($prefix); ?>menu_id" name="<?php echo esc_attr($prefix); ?>menu_id">
-                        <option value="0">– <?php esc_html_e('Select a menu', 'wordpress-static-generator'); ?> –</option>
+                        <option value="0">– <?php esc_html_e('Select a menu', 'content2html'); ?> –</option>
                         <?php foreach ($menus as $menu): ?>
                             <option value="<?php echo esc_attr((string) $menu->term_id); ?>" <?php selected((int) $settings[$prefix . 'menu_id'], $menu->term_id); ?>>
                                 <?php echo esc_html($menu->name); ?>
@@ -461,43 +461,43 @@ class WPStatic_Settings {
                         <?php endforeach; ?>
                     </select>
                     <?php if (empty($menus)): ?>
-                        <p class="description"><?php esc_html_e('No menus found - create one first under Appearance → Menus.', 'wordpress-static-generator'); ?></p>
+                        <p class="description"><?php esc_html_e('No menus found - create one first under Appearance → Menus.', 'content2html'); ?></p>
                     <?php endif; ?>
                 </td>
             </tr>
             <tr class="wpstatic-nav-detail">
-                <th><label for="<?php echo esc_attr($prefix); ?>wrapper_marker"><?php esc_html_e('Wrapper marker', 'wordpress-static-generator'); ?></label></th>
+                <th><label for="<?php echo esc_attr($prefix); ?>wrapper_marker"><?php esc_html_e('Wrapper marker', 'content2html'); ?></label></th>
                 <td>
                     <input type="text" id="<?php echo esc_attr($prefix); ?>wrapper_marker" name="<?php echo esc_attr($prefix); ?>wrapper_marker" value="<?php echo esc_attr($settings[$prefix . 'wrapper_marker']); ?>" class="regular-text">
-                    <p class="description"><?php esc_html_e('Wraps the ENTIRE menu area in the template (e.g. the outer <ul>).', 'wordpress-static-generator'); ?></p>
+                    <p class="description"><?php esc_html_e('Wraps the ENTIRE menu area in the template (e.g. the outer <ul>).', 'content2html'); ?></p>
                 </td>
             </tr>
             <tr class="wpstatic-nav-detail">
-                <th><label for="<?php echo esc_attr($prefix); ?>item_marker"><?php esc_html_e('Item marker', 'wordpress-static-generator'); ?></label></th>
+                <th><label for="<?php echo esc_attr($prefix); ?>item_marker"><?php esc_html_e('Item marker', 'content2html'); ?></label></th>
                 <td>
                     <input type="text" id="<?php echo esc_attr($prefix); ?>item_marker" name="<?php echo esc_attr($prefix); ?>item_marker" value="<?php echo esc_attr($settings[$prefix . 'item_marker']); ?>" class="regular-text">
-                    <p class="description"><?php esc_html_e('Wraps EXACTLY ONE demo menu item without sub-items (e.g. one <li>) - duplicated for each real menu item.', 'wordpress-static-generator'); ?></p>
+                    <p class="description"><?php esc_html_e('Wraps EXACTLY ONE demo menu item without sub-items (e.g. one <li>) - duplicated for each real menu item.', 'content2html'); ?></p>
                 </td>
             </tr>
             <tr class="wpstatic-nav-detail">
-                <th><label for="<?php echo esc_attr($prefix); ?>parent_item_marker"><?php esc_html_e('Parent item marker (optional)', 'wordpress-static-generator'); ?></label></th>
+                <th><label for="<?php echo esc_attr($prefix); ?>parent_item_marker"><?php esc_html_e('Parent item marker (optional)', 'content2html'); ?></label></th>
                 <td>
                     <input type="text" id="<?php echo esc_attr($prefix); ?>parent_item_marker" name="<?php echo esc_attr($prefix); ?>parent_item_marker" value="<?php echo esc_attr($settings[$prefix . 'parent_item_marker']); ?>" class="regular-text">
-                    <p class="description"><?php esc_html_e('Only needed for multi-level menus. Without this marker, sub-items are ignored (flat display).', 'wordpress-static-generator'); ?></p>
+                    <p class="description"><?php esc_html_e('Only needed for multi-level menus. Without this marker, sub-items are ignored (flat display).', 'content2html'); ?></p>
                 </td>
             </tr>
             <tr class="wpstatic-nav-detail">
-                <th><label for="<?php echo esc_attr($prefix); ?>submenu_wrapper_marker"><?php esc_html_e('Submenu wrapper marker', 'wordpress-static-generator'); ?></label></th>
+                <th><label for="<?php echo esc_attr($prefix); ?>submenu_wrapper_marker"><?php esc_html_e('Submenu wrapper marker', 'content2html'); ?></label></th>
                 <td>
                     <input type="text" id="<?php echo esc_attr($prefix); ?>submenu_wrapper_marker" name="<?php echo esc_attr($prefix); ?>submenu_wrapper_marker" value="<?php echo esc_attr($settings[$prefix . 'submenu_wrapper_marker']); ?>" class="regular-text">
-                    <p class="description"><?php esc_html_e('Only relevant if "Parent item marker" is set - wraps the container for sub-items INSIDE the parent template.', 'wordpress-static-generator'); ?></p>
+                    <p class="description"><?php esc_html_e('Only relevant if "Parent item marker" is set - wraps the container for sub-items INSIDE the parent template.', 'content2html'); ?></p>
                 </td>
             </tr>
             <tr class="wpstatic-nav-detail">
-                <th><label for="<?php echo esc_attr($prefix); ?>submenu_item_marker"><?php esc_html_e('Submenu item marker (optional)', 'wordpress-static-generator'); ?></label></th>
+                <th><label for="<?php echo esc_attr($prefix); ?>submenu_item_marker"><?php esc_html_e('Submenu item marker (optional)', 'content2html'); ?></label></th>
                 <td>
                     <input type="text" id="<?php echo esc_attr($prefix); ?>submenu_item_marker" name="<?php echo esc_attr($prefix); ?>submenu_item_marker" value="<?php echo esc_attr($settings[$prefix . 'submenu_item_marker']); ?>" class="regular-text">
-                    <p class="description"><?php esc_html_e('Leave empty to use the same template as "Item marker" for sub-items.', 'wordpress-static-generator'); ?></p>
+                    <p class="description"><?php esc_html_e('Leave empty to use the same template as "Item marker" for sub-items.', 'content2html'); ?></p>
                 </td>
             </tr>
         </table>
@@ -514,23 +514,23 @@ class WPStatic_Settings {
             case UPLOAD_ERR_INI_SIZE:
                 return sprintf(
                     /* translators: %s: upload_max_filesize ini value */
-                    __('The file exceeds the server limit upload_max_filesize (currently: %s). Please shrink the ZIP or ask your host to raise the limit.', 'wordpress-static-generator'),
+                    __('The file exceeds the server limit upload_max_filesize (currently: %s). Please shrink the ZIP or ask your host to raise the limit.', 'content2html'),
                     ini_get('upload_max_filesize')
                 );
             case UPLOAD_ERR_FORM_SIZE:
-                return __('The file exceeds the maximum allowed by the form.', 'wordpress-static-generator');
+                return __('The file exceeds the maximum allowed by the form.', 'content2html');
             case UPLOAD_ERR_PARTIAL:
-                return __('The file was only partially uploaded. Please try again.', 'wordpress-static-generator');
+                return __('The file was only partially uploaded. Please try again.', 'content2html');
             case UPLOAD_ERR_NO_TMP_DIR:
-                return __('Server error: no temporary directory available for uploads.', 'wordpress-static-generator');
+                return __('Server error: no temporary directory available for uploads.', 'content2html');
             case UPLOAD_ERR_CANT_WRITE:
-                return __('Server error: the file could not be written to disk.', 'wordpress-static-generator');
+                return __('Server error: the file could not be written to disk.', 'content2html');
             case UPLOAD_ERR_EXTENSION:
-                return __('The upload was stopped by a PHP extension.', 'wordpress-static-generator');
+                return __('The upload was stopped by a PHP extension.', 'content2html');
             default:
                 return sprintf(
                     /* translators: %d: PHP upload error code */
-                    __('Unknown upload error (code %d).', 'wordpress-static-generator'),
+                    __('Unknown upload error (code %d).', 'content2html'),
                     $error
                 );
         }
@@ -545,18 +545,18 @@ class WPStatic_Settings {
         $hasVendor = file_exists(WPSTATIC_DEPLOY_DIR . 'vendor/autoload.php');
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e('Static Deploy – Settings', 'wordpress-static-generator'); ?></h1>
+            <h1><?php esc_html_e('Content2HTML – Settings', 'content2html'); ?></h1>
 
             <div id="wpstatic-unsaved-notice" class="notice notice-warning" style="display:none;">
                 <p>
-                    <strong><?php esc_html_e('You have unsaved changes.', 'wordpress-static-generator'); ?></strong>
-                    <?php esc_html_e('"Deploy all" and "Deploy assets only" use the last', 'wordpress-static-generator'); ?>
-                    <strong><?php esc_html_e('saved', 'wordpress-static-generator'); ?></strong> <?php esc_html_e('settings, not your current input - please click "Save settings" first.', 'wordpress-static-generator'); ?>
+                    <strong><?php esc_html_e('You have unsaved changes.', 'content2html'); ?></strong>
+                    <?php esc_html_e('"Deploy all" and "Deploy assets only" use the last', 'content2html'); ?>
+                    <strong><?php esc_html_e('saved', 'content2html'); ?></strong> <?php esc_html_e('settings, not your current input - please click "Save settings" first.', 'content2html'); ?>
                 </p>
             </div>
 
             <?php if (isset($_GET['saved'])): ?>
-                <div class="notice notice-success is-dismissible"><p><?php esc_html_e('Settings saved.', 'wordpress-static-generator'); ?></p></div>
+                <div class="notice notice-success is-dismissible"><p><?php esc_html_e('Settings saved.', 'content2html'); ?></p></div>
             <?php endif; ?>
 
             <?php
@@ -568,7 +568,7 @@ class WPStatic_Settings {
                 <div class="notice <?php echo esc_attr($noticeClass); ?> is-dismissible">
                     <p><?php echo esc_html($assetsUploadResult['message']); ?></p>
                     <?php if (!empty($assetsUploadResult['warnings'])): ?>
-                        <p><strong><?php esc_html_e('Warning: suspicious file types found in the assets', 'wordpress-static-generator'); ?></strong> (<?php esc_html_e('included anyway, please review', 'wordpress-static-generator'); ?>):</p>
+                        <p><strong><?php esc_html_e('Warning: suspicious file types found in the assets', 'content2html'); ?></strong> (<?php esc_html_e('included anyway, please review', 'content2html'); ?>):</p>
                         <ul style="list-style: disc; margin-left: 20px;">
                             <?php foreach ($assetsUploadResult['warnings'] as $warning): ?>
                                 <li><code><?php echo esc_html($warning); ?></code></li>
@@ -605,10 +605,10 @@ class WPStatic_Settings {
             <?php if (!WPStatic_Crypto::usesConfigKey()): ?>
                 <div class="notice notice-warning">
                     <p>
-                        <?php esc_html_e('No', 'wordpress-static-generator'); ?> <code>WPSTATIC_ENCRYPTION_KEY</code> <?php esc_html_e('found in', 'wordpress-static-generator'); ?> <code>wp-config.php</code>.
-                        <?php esc_html_e('Secrets are still stored encrypted, but with an auto-generated key that also lives in the database. Recommended:', 'wordpress-static-generator'); ?>
-                        <code>define('WPSTATIC_ENCRYPTION_KEY', '<?php esc_html_e('a-long-random-value', 'wordpress-static-generator'); ?>');</code>
-                        <?php esc_html_e('add to wp-config.php.', 'wordpress-static-generator'); ?>
+                        <?php esc_html_e('No', 'content2html'); ?> <code>WPSTATIC_ENCRYPTION_KEY</code> <?php esc_html_e('found in', 'content2html'); ?> <code>wp-config.php</code>.
+                        <?php esc_html_e('Secrets are still stored encrypted, but with an auto-generated key that also lives in the database. Recommended:', 'content2html'); ?>
+                        <code>define('WPSTATIC_ENCRYPTION_KEY', '<?php esc_html_e('a-long-random-value', 'content2html'); ?>');</code>
+                        <?php esc_html_e('add to wp-config.php.', 'content2html'); ?>
                     </p>
                 </div>
             <?php endif; ?>
@@ -616,7 +616,7 @@ class WPStatic_Settings {
             <?php if ($settings['target'] === 'sftp' && !$hasVendor): ?>
                 <div class="notice notice-error">
                     <p>
-                        <?php esc_html_e('SFTP target selected, but', 'wordpress-static-generator'); ?> <code>vendor/phpseclib</code> <?php esc_html_e('was not found. See README.md in the plugin directory for installation.', 'wordpress-static-generator'); ?>
+                        <?php esc_html_e('SFTP target selected, but', 'content2html'); ?> <code>vendor/phpseclib</code> <?php esc_html_e('was not found. See README.md in the plugin directory for installation.', 'content2html'); ?>
                     </p>
                 </div>
             <?php endif; ?>
@@ -626,40 +626,40 @@ class WPStatic_Settings {
                 <?php wp_nonce_field(self::NONCE_ACTION); ?>
 
                 <h2 class="nav-tab-wrapper wpstatic-tabs">
-                    <a href="#" class="nav-tab" data-tab="inhalte"><?php esc_html_e('Content', 'wordpress-static-generator'); ?></a>
-                    <a href="#" class="nav-tab" data-tab="navigation"><?php esc_html_e('Navigation', 'wordpress-static-generator'); ?></a>
-                    <a href="#" class="nav-tab" data-tab="formulare"><?php esc_html_e('Forms', 'wordpress-static-generator'); ?></a>
-                    <a href="#" class="nav-tab" data-tab="ziel"><?php esc_html_e('Deployment target', 'wordpress-static-generator'); ?></a>
-                    <a href="#" class="nav-tab" data-tab="markdown"><?php esc_html_e('Markdown export', 'wordpress-static-generator'); ?></a>
+                    <a href="#" class="nav-tab" data-tab="inhalte"><?php esc_html_e('Content', 'content2html'); ?></a>
+                    <a href="#" class="nav-tab" data-tab="navigation"><?php esc_html_e('Navigation', 'content2html'); ?></a>
+                    <a href="#" class="nav-tab" data-tab="formulare"><?php esc_html_e('Forms', 'content2html'); ?></a>
+                    <a href="#" class="nav-tab" data-tab="ziel"><?php esc_html_e('Deployment target', 'content2html'); ?></a>
+                    <a href="#" class="nav-tab" data-tab="markdown"><?php esc_html_e('Markdown export', 'content2html'); ?></a>
                 </h2>
 
                 <div class="wpstatic-tab-panel" data-tab-panel="inhalte">
-                <h2 class="title"><?php esc_html_e('Content', 'wordpress-static-generator'); ?></h2>
+                <h2 class="title"><?php esc_html_e('Content', 'content2html'); ?></h2>
                 <table class="form-table">
                     <tr>
-                        <th><?php esc_html_e('Post Types', 'wordpress-static-generator'); ?></th>
+                        <th><?php esc_html_e('Post Types', 'content2html'); ?></th>
                         <td>
-                            <label><input type="checkbox" name="post_types[]" value="post" <?php checked(in_array('post', $settings['post_types'], true)); ?>> <?php esc_html_e('Posts', 'wordpress-static-generator'); ?></label><br>
-                            <label><input type="checkbox" name="post_types[]" value="page" <?php checked(in_array('page', $settings['post_types'], true)); ?>> <?php esc_html_e('Pages', 'wordpress-static-generator'); ?></label>
+                            <label><input type="checkbox" name="post_types[]" value="post" <?php checked(in_array('post', $settings['post_types'], true)); ?>> <?php esc_html_e('Posts', 'content2html'); ?></label><br>
+                            <label><input type="checkbox" name="post_types[]" value="page" <?php checked(in_array('page', $settings['post_types'], true)); ?>> <?php esc_html_e('Pages', 'content2html'); ?></label>
                         </td>
                     </tr>
                     <tr>
-                        <th><label for="wpstatic_template"><?php esc_html_e('Template file', 'wordpress-static-generator'); ?></label></th>
+                        <th><label for="wpstatic_template"><?php esc_html_e('Template file', 'content2html'); ?></label></th>
                         <td>
                             <?php if (!empty($settings['template_path'])): ?>
-                                <p><?php esc_html_e('Current:', 'wordpress-static-generator'); ?> <code><?php echo esc_html(basename($settings['template_path'])); ?></code></p>
+                                <p><?php esc_html_e('Current:', 'content2html'); ?> <code><?php echo esc_html(basename($settings['template_path'])); ?></code></p>
                                 <input type="hidden" name="template_path_existing" value="<?php echo esc_attr($settings['template_path']); ?>">
                             <?php endif; ?>
                             <input type="file" id="wpstatic_template" name="template_file" accept=".html,.htm">
-                            <p class="description"><?php esc_html_e('HTML file with placeholders (e.g.', 'wordpress-static-generator'); ?> <code>###title###</code>). <?php esc_html_e('Leave empty to keep the current file.', 'wordpress-static-generator'); ?></p>
+                            <p class="description"><?php esc_html_e('HTML file with placeholders (e.g.', 'content2html'); ?> <code>###title###</code>). <?php esc_html_e('Leave empty to keep the current file.', 'content2html'); ?></p>
                         </td>
                     </tr>
                     <tr>
-                        <th><?php esc_html_e('Additional templates', 'wordpress-static-generator'); ?></th>
+                        <th><?php esc_html_e('Additional templates', 'content2html'); ?></th>
                         <td>
                             <?php if (!empty($settings['extra_templates'])): ?>
                                 <table class="widefat" style="max-width: 500px; margin-bottom: 10px;">
-                                    <thead><tr><th><?php esc_html_e('Name', 'wordpress-static-generator'); ?></th><th><?php esc_html_e('File', 'wordpress-static-generator'); ?></th><th><?php esc_html_e('Remove', 'wordpress-static-generator'); ?></th></tr></thead>
+                                    <thead><tr><th><?php esc_html_e('Name', 'content2html'); ?></th><th><?php esc_html_e('File', 'content2html'); ?></th><th><?php esc_html_e('Remove', 'content2html'); ?></th></tr></thead>
                                     <tbody>
                                         <?php foreach ($settings['extra_templates'] as $tpl): ?>
                                             <tr>
@@ -671,16 +671,16 @@ class WPStatic_Settings {
                                     </tbody>
                                 </table>
                             <?php else: ?>
-                                <p class="description"><?php esc_html_e('No additional templates set up yet.', 'wordpress-static-generator'); ?></p>
+                                <p class="description"><?php esc_html_e('No additional templates set up yet.', 'content2html'); ?></p>
                             <?php endif; ?>
 
                             <p>
-                                <label for="new_template_name"><?php esc_html_e('Add new template (name required):', 'wordpress-static-generator'); ?></label><br>
-                                <input type="text" id="new_template_name" name="new_template_name" class="regular-text" placeholder="<?php echo esc_attr__('e.g. Landing page (required so it appears in the dropdown)', 'wordpress-static-generator'); ?>">
+                                <label for="new_template_name"><?php esc_html_e('Add new template (name required):', 'content2html'); ?></label><br>
+                                <input type="text" id="new_template_name" name="new_template_name" class="regular-text" placeholder="<?php echo esc_attr__('e.g. Landing page (required so it appears in the dropdown)', 'content2html'); ?>">
                                 <input type="file" id="new_template_file" name="new_template_file" accept=".html,.htm">
                             </p>
                             <p class="description">
-                                <?php esc_html_e('Then available per post/page as an alternative to the default template (dropdown in the "Static Deploy" meta box on the edit screen).', 'wordpress-static-generator'); ?>
+                                <?php esc_html_e('Then available per post/page as an alternative to the default template (dropdown in the "Content2HTML" meta box on the edit screen).', 'content2html'); ?>
                             </p>
                         </td>
                     </tr>
@@ -690,141 +690,141 @@ class WPStatic_Settings {
                             <?php $assetsStatus = WPStatic_AssetsManager::getStatus(); ?>
                             <?php if ($assetsStatus['exists']): ?>
                                 <p>
-                                    <?php esc_html_e('Currently set up:', 'wordpress-static-generator'); ?> <strong><?php echo esc_html((string) $assetsStatus['file_count']); ?> <?php esc_html_e('files', 'wordpress-static-generator'); ?></strong>
+                                    <?php esc_html_e('Currently set up:', 'content2html'); ?> <strong><?php echo esc_html((string) $assetsStatus['file_count']); ?> <?php esc_html_e('files', 'content2html'); ?></strong>
                                     (<?php echo esc_html(size_format($assetsStatus['total_size'])); ?>)
                                     <?php if (!empty($assetsStatus['updated_at'])): ?>
-                                        &ndash; <?php esc_html_e('last updated on', 'wordpress-static-generator'); ?> <?php echo esc_html(date_i18n('d.m.Y H:i', $assetsStatus['updated_at'])); ?>
+                                        &ndash; <?php esc_html_e('last updated on', 'content2html'); ?> <?php echo esc_html(date_i18n('d.m.Y H:i', $assetsStatus['updated_at'])); ?>
                                     <?php endif; ?>
                                 </p>
                             <?php else: ?>
-                                <p><?php esc_html_e('No assets set up yet.', 'wordpress-static-generator'); ?></p>
+                                <p><?php esc_html_e('No assets set up yet.', 'content2html'); ?></p>
                             <?php endif; ?>
                             <input type="file" id="wpstatic_assets" name="assets_zip" accept=".zip">
                             <p class="description">
-                                <?php esc_html_e('ZIP file whose root already is a folder named', 'wordpress-static-generator'); ?> <code>assets/</code>
-                                (<?php esc_html_e('i.e. zip the assets folder itself, not just its contents', 'wordpress-static-generator'); ?>).
-                                <?php esc_html_e('Copied 1:1 into the build folder so template references like', 'wordpress-static-generator'); ?>
-                                <code>href="assets/css/styles.css"</code> <?php esc_html_e('work.', 'wordpress-static-generator'); ?>
+                                <?php esc_html_e('ZIP file whose root already is a folder named', 'content2html'); ?> <code>assets/</code>
+                                (<?php esc_html_e('i.e. zip the assets folder itself, not just its contents', 'content2html'); ?>).
+                                <?php esc_html_e('Copied 1:1 into the build folder so template references like', 'content2html'); ?>
+                                <code>href="assets/css/styles.css"</code> <?php esc_html_e('work.', 'content2html'); ?>
                             </p>
                             <p class="description">
-                                <?php esc_html_e('Server upload limit: max.', 'wordpress-static-generator'); ?> <code><?php echo esc_html(ini_get('upload_max_filesize')); ?></code>
-                                <?php esc_html_e('per file,', 'wordpress-static-generator'); ?> <code><?php echo esc_html(ini_get('post_max_size')); ?></code> <?php esc_html_e('per form submission overall. If your ZIP is bigger, please compress/trim assets first (e.g. remove unused font weights) or ask your host to raise the limit.', 'wordpress-static-generator'); ?>
+                                <?php esc_html_e('Server upload limit: max.', 'content2html'); ?> <code><?php echo esc_html(ini_get('upload_max_filesize')); ?></code>
+                                <?php esc_html_e('per file,', 'content2html'); ?> <code><?php echo esc_html(ini_get('post_max_size')); ?></code> <?php esc_html_e('per form submission overall. If your ZIP is bigger, please compress/trim assets first (e.g. remove unused font weights) or ask your host to raise the limit.', 'content2html'); ?>
                             </p>
                         </td>
                     </tr>
                     <tr>
-                        <th><label for="date_format"><?php esc_html_e('Date format', 'wordpress-static-generator'); ?></label></th>
+                        <th><label for="date_format"><?php esc_html_e('Date format', 'content2html'); ?></label></th>
                         <td><input type="text" id="date_format" name="date_format" value="<?php echo esc_attr($settings['date_format']); ?>" class="regular-text" placeholder="d.m.Y"></td>
                     </tr>
                     <tr>
-                        <th><label for="remove_wp_tags"><?php esc_html_e('Remove WP CSS classes', 'wordpress-static-generator'); ?></label></th>
-                        <td><label><input type="checkbox" id="remove_wp_tags" name="remove_wp_tags" <?php checked('on', $settings['remove_wp_tags']); ?>> <?php esc_html_e('active', 'wordpress-static-generator'); ?></label></td>
+                        <th><label for="remove_wp_tags"><?php esc_html_e('Remove WP CSS classes', 'content2html'); ?></label></th>
+                        <td><label><input type="checkbox" id="remove_wp_tags" name="remove_wp_tags" <?php checked('on', $settings['remove_wp_tags']); ?>> <?php esc_html_e('active', 'content2html'); ?></label></td>
                     </tr>
                     <tr>
-                        <th><label for="data_injection_rules"><?php esc_html_e('Data injection rules', 'wordpress-static-generator'); ?></label></th>
+                        <th><label for="data_injection_rules"><?php esc_html_e('Data injection rules', 'content2html'); ?></label></th>
                         <td><textarea id="data_injection_rules" name="data_injection_rules" rows="6" class="large-text code" placeholder="title->rendered => ###title###"><?php echo esc_textarea($settings['data_injection_rules']); ?></textarea></td>
                     </tr>
                     <tr>
-                        <th><label for="change_url_rules"><?php esc_html_e('Change-URL rules', 'wordpress-static-generator'); ?></label></th>
+                        <th><label for="change_url_rules"><?php esc_html_e('Change-URL rules', 'content2html'); ?></label></th>
                         <td><textarea id="change_url_rules" name="change_url_rules" rows="4" class="large-text code"><?php echo esc_textarea($settings['change_url_rules']); ?></textarea></td>
                     </tr>
                     <tr>
-                        <th><label for="tidy_html_rules"><?php esc_html_e('Tidy HTML rules', 'wordpress-static-generator'); ?></label></th>
+                        <th><label for="tidy_html_rules"><?php esc_html_e('Tidy HTML rules', 'content2html'); ?></label></th>
                         <td><textarea id="tidy_html_rules" name="tidy_html_rules" rows="4" class="large-text code"><?php echo esc_textarea($settings['tidy_html_rules']); ?></textarea></td>
                     </tr>
                 </table>
                 </div>
 
                 <div class="wpstatic-tab-panel" data-tab-panel="formulare">
-                <h2 class="title"><?php esc_html_e('Forms', 'wordpress-static-generator'); ?></h2>
+                <h2 class="title"><?php esc_html_e('Forms', 'content2html'); ?></h2>
                 <table class="form-table">
                     <tr>
-                        <th><?php esc_html_e('Enable forms', 'wordpress-static-generator'); ?></th>
+                        <th><?php esc_html_e('Enable forms', 'content2html'); ?></th>
                         <td>
                             <label>
                                 <input type="checkbox" name="forms_enabled" <?php checked('on', $settings['forms_enabled']); ?>>
-                                <?php esc_html_e('Make &lt;form&gt; tags on generated pages functional', 'wordpress-static-generator'); ?>
+                                <?php esc_html_e('Make &lt;form&gt; tags on generated pages functional', 'content2html'); ?>
                             </label>
                             <p class="description">
-                                <strong>Netlify:</strong> <?php esc_html_e('forms automatically get', 'wordpress-static-generator'); ?> <code>data-netlify="true"</code>
-                                <?php esc_html_e('and a hidden', 'wordpress-static-generator'); ?> <code>form-name</code> <?php esc_html_e('field - Netlify Forms then detects and processes them on its own, no server code needed.', 'wordpress-static-generator'); ?><br>
-                                <strong>SFTP:</strong> <?php esc_html_e('the form', 'wordpress-static-generator'); ?> <code>action</code> <?php esc_html_e('is rewritten to a bundled PHP handler', 'wordpress-static-generator'); ?> (<code>form-handler.php</code>) <?php esc_html_e('that emails submissions. Requires the target server to run PHP.', 'wordpress-static-generator'); ?>
+                                <strong>Netlify:</strong> <?php esc_html_e('forms automatically get', 'content2html'); ?> <code>data-netlify="true"</code>
+                                <?php esc_html_e('and a hidden', 'content2html'); ?> <code>form-name</code> <?php esc_html_e('field - Netlify Forms then detects and processes them on its own, no server code needed.', 'content2html'); ?><br>
+                                <strong>SFTP:</strong> <?php esc_html_e('the form', 'content2html'); ?> <code>action</code> <?php esc_html_e('is rewritten to a bundled PHP handler', 'content2html'); ?> (<code>form-handler.php</code>) <?php esc_html_e('that emails submissions. Requires the target server to run PHP.', 'content2html'); ?>
                             </p>
                         </td>
                     </tr>
                     <tr>
-                        <th><label for="form_recipient_email"><?php esc_html_e('Recipient email (SFTP only)', 'wordpress-static-generator'); ?></label></th>
+                        <th><label for="form_recipient_email"><?php esc_html_e('Recipient email (SFTP only)', 'content2html'); ?></label></th>
                         <td><input type="email" id="form_recipient_email" name="form_recipient_email" value="<?php echo esc_attr($settings['form_recipient_email']); ?>" class="regular-text" placeholder="kontakt@example.com"></td>
                     </tr>
                     <tr>
-                        <th><label for="form_from_email"><?php esc_html_e('Sender address (SFTP only)', 'wordpress-static-generator'); ?></label></th>
+                        <th><label for="form_from_email"><?php esc_html_e('Sender address (SFTP only)', 'content2html'); ?></label></th>
                         <td>
                             <input type="email" id="form_from_email" name="form_from_email" value="<?php echo esc_attr($settings['form_from_email']); ?>" class="regular-text" placeholder="noreply@example.com">
-                            <p class="description"><?php esc_html_e('Leave empty to use the server default address. Many hosts only accept sender addresses from their own domain.', 'wordpress-static-generator'); ?></p>
+                            <p class="description"><?php esc_html_e('Leave empty to use the server default address. Many hosts only accept sender addresses from their own domain.', 'content2html'); ?></p>
                         </td>
                     </tr>
                     <tr>
-                        <th><label for="form_subject_prefix"><?php esc_html_e('Subject prefix (SFTP only)', 'wordpress-static-generator'); ?></label></th>
+                        <th><label for="form_subject_prefix"><?php esc_html_e('Subject prefix (SFTP only)', 'content2html'); ?></label></th>
                         <td><input type="text" id="form_subject_prefix" name="form_subject_prefix" value="<?php echo esc_attr($settings['form_subject_prefix']); ?>" class="regular-text" placeholder="[Kontaktformular]"></td>
                     </tr>
                     <tr>
-                        <th><label for="form_redirect_url"><?php esc_html_e('Thank-you page (Netlify + SFTP)', 'wordpress-static-generator'); ?></label></th>
+                        <th><label for="form_redirect_url"><?php esc_html_e('Thank-you page (Netlify + SFTP)', 'content2html'); ?></label></th>
                         <td>
                             <input type="url" id="form_redirect_url" name="form_redirect_url" value="<?php echo esc_attr($settings['form_redirect_url']); ?>" class="regular-text" placeholder="https://example.com/danke/">
                             <p class="description">
-                                <?php esc_html_e('Leave empty to redirect back to the originating page after submission automatically. Important for Netlify: the form\'s original', 'wordpress-static-generator'); ?> <code>action</code> (<?php esc_html_e('points to a WordPress URL', 'wordpress-static-generator'); ?>) <?php esc_html_e('is always replaced - either by this thank-you page, or, if empty, by removing the', 'wordpress-static-generator'); ?> <code>action</code> (<?php esc_html_e('submits to the current page', 'wordpress-static-generator'); ?>).
+                                <?php esc_html_e('Leave empty to redirect back to the originating page after submission automatically. Important for Netlify: the form\'s original', 'content2html'); ?> <code>action</code> (<?php esc_html_e('points to a WordPress URL', 'content2html'); ?>) <?php esc_html_e('is always replaced - either by this thank-you page, or, if empty, by removing the', 'content2html'); ?> <code>action</code> (<?php esc_html_e('submits to the current page', 'content2html'); ?>).
                             </p>
                         </td>
                     </tr>
                     <tr>
-                        <th><label for="form_honeypot_field"><?php esc_html_e('Honeypot field name (SFTP only)', 'wordpress-static-generator'); ?></label></th>
+                        <th><label for="form_honeypot_field"><?php esc_html_e('Honeypot field name (SFTP only)', 'content2html'); ?></label></th>
                         <td>
                             <input type="text" id="form_honeypot_field" name="form_honeypot_field" value="<?php echo esc_attr($settings['form_honeypot_field']); ?>" class="regular-text">
-                            <p class="description"><?php esc_html_e('Simple spam deterrent: a CSS-hidden field that only bots fill in. Letters/numbers/underscore/hyphen only.', 'wordpress-static-generator'); ?></p>
+                            <p class="description"><?php esc_html_e('Simple spam deterrent: a CSS-hidden field that only bots fill in. Letters/numbers/underscore/hyphen only.', 'content2html'); ?></p>
                         </td>
                     </tr>
                     <tr>
-                        <th><label for="form_custom_action"><?php esc_html_e('Custom form target (SFTP only)', 'wordpress-static-generator'); ?></label></th>
+                        <th><label for="form_custom_action"><?php esc_html_e('Custom form target (SFTP only)', 'content2html'); ?></label></th>
                         <td>
                             <input type="url" id="form_custom_action" name="form_custom_action" value="<?php echo esc_attr($settings['form_custom_action']); ?>" class="regular-text" placeholder="https://example.com/mein-eigener-handler.php">
                             <p class="description">
-                                <?php esc_html_e('Leave empty to use our bundled PHP handler', 'wordpress-static-generator'); ?> (<code>/form-handler.php</code>) - <?php esc_html_e('requires the target server to run PHP. If something else runs there (e.g. your own endpoint, an external form service), enter its URL here - the form', 'wordpress-static-generator'); ?> <code>action</code> <?php esc_html_e('is then rewritten to it, and our', 'wordpress-static-generator'); ?> <code>form-handler.php</code> <?php esc_html_e('is not created/uploaded in that case.', 'wordpress-static-generator'); ?>
+                                <?php esc_html_e('Leave empty to use our bundled PHP handler', 'content2html'); ?> (<code>/form-handler.php</code>) - <?php esc_html_e('requires the target server to run PHP. If something else runs there (e.g. your own endpoint, an external form service), enter its URL here - the form', 'content2html'); ?> <code>action</code> <?php esc_html_e('is then rewritten to it, and our', 'content2html'); ?> <code>form-handler.php</code> <?php esc_html_e('is not created/uploaded in that case.', 'content2html'); ?>
                             </p>
                         </td>
                     </tr>
                 </table>
 
-                <h3><?php esc_html_e('Client-side validation', 'wordpress-static-generator'); ?></h3>
+                <h3><?php esc_html_e('Client-side validation', 'content2html'); ?></h3>
                 <p class="description">
-                    <?php esc_html_e('Runs automatically as soon as forms are enabled above (for Netlify AND SFTP) - no extra toggle needed. Checks in the browser BEFORE submitting: fields with', 'wordpress-static-generator'); ?>
-                    <code>aria-required="true"</code> <?php esc_html_e('must be filled in (for checkbox/radio groups: at least one option),', 'wordpress-static-generator'); ?>
-                    <code>type="email"</code> <?php esc_html_e('fields must look like an email address. Most accessible form plugins (Fluent Forms, WPForms, Gravity Forms etc.) already set these attributes automatically - no configuration needed. If your form plugin doesn\'t set these attributes, the check simply doesn\'t apply (data is then submitted unvalidated, as before).', 'wordpress-static-generator'); ?>
+                    <?php esc_html_e('Runs automatically as soon as forms are enabled above (for Netlify AND SFTP) - no extra toggle needed. Checks in the browser BEFORE submitting: fields with', 'content2html'); ?>
+                    <code>aria-required="true"</code> <?php esc_html_e('must be filled in (for checkbox/radio groups: at least one option),', 'content2html'); ?>
+                    <code>type="email"</code> <?php esc_html_e('fields must look like an email address. Most accessible form plugins (Fluent Forms, WPForms, Gravity Forms etc.) already set these attributes automatically - no configuration needed. If your form plugin doesn\'t set these attributes, the check simply doesn\'t apply (data is then submitted unvalidated, as before).', 'content2html'); ?>
                 </p>
                 </div>
 
                 <div class="wpstatic-tab-panel" data-tab-panel="navigation">
-                <h2 class="title"><?php esc_html_e('Navigation', 'wordpress-static-generator'); ?></h2>
+                <h2 class="title"><?php esc_html_e('Navigation', 'content2html'); ?></h2>
                 <p class="description">
-                    <?php esc_html_e('Replaces marker comments in the template with real menu items from a WordPress menu. Details for each marker are right next to the respective fields below.', 'wordpress-static-generator'); ?>
+                    <?php esc_html_e('Replaces marker comments in the template with real menu items from a WordPress menu. Details for each marker are right next to the respective fields below.', 'content2html'); ?>
                 </p>
-                <?php $this->renderNavigationFields('nav_main_', __('Main navigation', 'wordpress-static-generator'), $settings); ?>
-                <?php $this->renderNavigationFields('nav_footer_', __('Footer navigation', 'wordpress-static-generator'), $settings); ?>
+                <?php $this->renderNavigationFields('nav_main_', __('Main navigation', 'content2html'), $settings); ?>
+                <?php $this->renderNavigationFields('nav_footer_', __('Footer navigation', 'content2html'), $settings); ?>
                 <table class="form-table">
                     <tr>
-                        <th><label for="nav_active_class"><?php esc_html_e('CSS class for active page', 'wordpress-static-generator'); ?></label></th>
+                        <th><label for="nav_active_class"><?php esc_html_e('CSS class for active page', 'content2html'); ?></label></th>
                         <td>
                             <input type="text" id="nav_active_class" name="nav_active_class" value="<?php echo esc_attr($settings['nav_active_class']); ?>" class="regular-text" placeholder="active">
-                            <p class="description"><?php esc_html_e('Set on the first &lt;a&gt; tag of the menu item matching the page currently being generated - applies to main and footer navigation alike.', 'wordpress-static-generator'); ?></p>
+                            <p class="description"><?php esc_html_e('Set on the first &lt;a&gt; tag of the menu item matching the page currently being generated - applies to main and footer navigation alike.', 'content2html'); ?></p>
                         </td>
                     </tr>
                 </table>
                 </div>
 
                 <div class="wpstatic-tab-panel" data-tab-panel="ziel">
-                <h2 class="title"><?php esc_html_e('Deployment target', 'wordpress-static-generator'); ?></h2>
+                <h2 class="title"><?php esc_html_e('Deployment target', 'content2html'); ?></h2>
                 <table class="form-table">
                     <tr>
-                        <th><?php esc_html_e('Target', 'wordpress-static-generator'); ?></th>
+                        <th><?php esc_html_e('Target', 'content2html'); ?></th>
                         <td>
                             <label><input type="radio" name="target" value="sftp" <?php checked('sftp', $settings['target']); ?> class="wpstatic-target-radio"> SFTP</label>
                             &nbsp;&nbsp;
@@ -844,16 +844,16 @@ class WPStatic_Settings {
                             <th><label for="netlify_token">Personal Access Token</label></th>
                             <td>
                                 <input type="password" id="netlify_token" name="netlify_token" value="" class="regular-text" autocomplete="new-password">
-                                <p class="description"><?php echo !empty($settings['netlify_token']) ? esc_html__('A token is already saved. Leave empty to keep it.', 'wordpress-static-generator') : esc_html__('No token saved yet.', 'wordpress-static-generator'); ?></p>
+                                <p class="description"><?php echo !empty($settings['netlify_token']) ? esc_html__('A token is already saved. Leave empty to keep it.', 'content2html') : esc_html__('No token saved yet.', 'content2html'); ?></p>
                             </td>
                         </tr>
                     </table>
                     <p>
-                        <button type="button" class="button" id="wpstatic-test-netlify-btn"><?php esc_html_e('Test connection', 'wordpress-static-generator'); ?></button>
+                        <button type="button" class="button" id="wpstatic-test-netlify-btn"><?php esc_html_e('Test connection', 'content2html'); ?></button>
                         <span id="wpstatic-test-netlify-result" class="wpstatic-test-result"></span>
                     </p>
                     <p class="description">
-                        <?php esc_html_e('Important: Netlify deploys always replace the entire site content. The single-page button (on every post/page edit screen) therefore triggers a full rebuild + redeploy on Netlify, not just an update of that one page.', 'wordpress-static-generator'); ?>
+                        <?php esc_html_e('Important: Netlify deploys always replace the entire site content. The single-page button (on every post/page edit screen) therefore triggers a full rebuild + redeploy on Netlify, not just an update of that one page.', 'content2html'); ?>
                     </p>
                 </div>
 
@@ -869,71 +869,71 @@ class WPStatic_Settings {
                             <td><input type="number" id="sftp_port" name="sftp_port" value="<?php echo esc_attr((string) $settings['sftp_port']); ?>" class="small-text"></td>
                         </tr>
                         <tr>
-                            <th><label for="sftp_username"><?php esc_html_e('Username', 'wordpress-static-generator'); ?></label></th>
+                            <th><label for="sftp_username"><?php esc_html_e('Username', 'content2html'); ?></label></th>
                             <td><input type="text" id="sftp_username" name="sftp_username" value="<?php echo esc_attr($settings['sftp_username']); ?>" class="regular-text"></td>
                         </tr>
                         <tr>
-                            <th><?php esc_html_e('Authentication', 'wordpress-static-generator'); ?></th>
+                            <th><?php esc_html_e('Authentication', 'content2html'); ?></th>
                             <td>
-                                <label><input type="radio" name="sftp_auth_method" value="password" <?php checked('password', $settings['sftp_auth_method']); ?> class="wpstatic-sftp-auth-radio"> <?php esc_html_e('Password', 'wordpress-static-generator'); ?></label>
+                                <label><input type="radio" name="sftp_auth_method" value="password" <?php checked('password', $settings['sftp_auth_method']); ?> class="wpstatic-sftp-auth-radio"> <?php esc_html_e('Password', 'content2html'); ?></label>
                                 &nbsp;&nbsp;
-                                <label><input type="radio" name="sftp_auth_method" value="key" <?php checked('key', $settings['sftp_auth_method']); ?> class="wpstatic-sftp-auth-radio"> <?php esc_html_e('Private key', 'wordpress-static-generator'); ?></label>
+                                <label><input type="radio" name="sftp_auth_method" value="key" <?php checked('key', $settings['sftp_auth_method']); ?> class="wpstatic-sftp-auth-radio"> <?php esc_html_e('Private key', 'content2html'); ?></label>
                             </td>
                         </tr>
                         <tr class="wpstatic-sftp-auth-password">
-                            <th><label for="sftp_password"><?php esc_html_e('Password', 'wordpress-static-generator'); ?></label></th>
+                            <th><label for="sftp_password"><?php esc_html_e('Password', 'content2html'); ?></label></th>
                             <td>
                                 <input type="password" id="sftp_password" name="sftp_password" value="" class="regular-text" autocomplete="new-password">
-                                <p class="description"><?php echo !empty($settings['sftp_password']) ? esc_html__('Already saved. Leave empty to keep it.', 'wordpress-static-generator') : ''; ?></p>
+                                <p class="description"><?php echo !empty($settings['sftp_password']) ? esc_html__('Already saved. Leave empty to keep it.', 'content2html') : ''; ?></p>
                             </td>
                         </tr>
                         <tr class="wpstatic-sftp-auth-key">
-                            <th><label for="sftp_private_key"><?php esc_html_e('Private key (PEM)', 'wordpress-static-generator'); ?></label></th>
+                            <th><label for="sftp_private_key"><?php esc_html_e('Private key (PEM)', 'content2html'); ?></label></th>
                             <td>
                                 <textarea id="sftp_private_key" name="sftp_private_key" rows="6" class="large-text code" placeholder="-----BEGIN OPENSSH PRIVATE KEY-----"></textarea>
-                                <p class="description"><?php echo !empty($settings['sftp_private_key']) ? esc_html__('Already saved. Leave empty to keep it.', 'wordpress-static-generator') : ''; ?></p>
+                                <p class="description"><?php echo !empty($settings['sftp_private_key']) ? esc_html__('Already saved. Leave empty to keep it.', 'content2html') : ''; ?></p>
                             </td>
                         </tr>
                         <tr class="wpstatic-sftp-auth-key">
-                            <th><label for="sftp_passphrase"><?php esc_html_e('Passphrase (if any)', 'wordpress-static-generator'); ?></label></th>
+                            <th><label for="sftp_passphrase"><?php esc_html_e('Passphrase (if any)', 'content2html'); ?></label></th>
                             <td><input type="password" id="sftp_passphrase" name="sftp_passphrase" value="" class="regular-text" autocomplete="new-password"></td>
                         </tr>
                         <tr>
-                            <th><label for="sftp_remote_base_path"><?php esc_html_e('Target directory on the server', 'wordpress-static-generator'); ?></label></th>
+                            <th><label for="sftp_remote_base_path"><?php esc_html_e('Target directory on the server', 'content2html'); ?></label></th>
                             <td><input type="text" id="sftp_remote_base_path" name="sftp_remote_base_path" value="<?php echo esc_attr($settings['sftp_remote_base_path']); ?>" class="regular-text" placeholder="/httpdocs/"></td>
                         </tr>
                     </table>
                     <p>
-                        <button type="button" class="button" id="wpstatic-test-sftp-btn"><?php esc_html_e('Test connection', 'wordpress-static-generator'); ?></button>
+                        <button type="button" class="button" id="wpstatic-test-sftp-btn"><?php esc_html_e('Test connection', 'content2html'); ?></button>
                         <span id="wpstatic-test-sftp-result" class="wpstatic-test-result"></span>
                     </p>
                 </div>
                 </div>
 
                 <div id="wpstatic-save-button-wrap">
-                <?php submit_button(__('Save settings', 'wordpress-static-generator')); ?>
+                <?php submit_button(__('Save settings', 'content2html')); ?>
                 </div>
             </form>
 
             <hr>
 
             <div id="wpstatic-transfer-section">
-            <h2 class="title"><?php esc_html_e('Deployment', 'wordpress-static-generator'); ?></h2>
+            <h2 class="title"><?php esc_html_e('Deployment', 'content2html'); ?></h2>
             <p>
                 <button type="button" class="button button-primary button-hero" id="wpstatic-deploy-all-btn">
-                    <?php esc_html_e('Deploy all', 'wordpress-static-generator'); ?>
+                    <?php esc_html_e('Deploy all', 'content2html'); ?>
                 </button>
                 <button type="button" class="button" id="wpstatic-deploy-assets-only-btn" <?php echo $assetsStatus['exists'] ? '' : 'disabled'; ?>>
-                    <?php esc_html_e('Deploy assets only', 'wordpress-static-generator'); ?>
+                    <?php esc_html_e('Deploy assets only', 'content2html'); ?>
                 </button>
             </p>
             <p>
                 <label>
                     <input type="checkbox" id="wpstatic-skip-assets" checked>
-                    <?php esc_html_e('Upload assets when deploying', 'wordpress-static-generator'); ?>
+                    <?php esc_html_e('Upload assets when deploying', 'content2html'); ?>
                 </label>
                 <?php if ($settings['target'] === 'netlify'): ?>
-                    <br><span class="description"><?php esc_html_e('On Netlify, assets are always uploaded (a deploy replaces the entire content) - this option has no effect here.', 'wordpress-static-generator'); ?></span>
+                    <br><span class="description"><?php esc_html_e('On Netlify, assets are always uploaded (a deploy replaces the entire content) - this option has no effect here.', 'content2html'); ?></span>
                 <?php endif; ?>
             </p>
             <div id="wpstatic-deploy-progress" style="display:none; max-width: 500px;">
@@ -946,10 +946,10 @@ class WPStatic_Settings {
             <hr id="wpstatic-transfer-hr">
 
             <div class="wpstatic-tab-panel" data-tab-panel="markdown">
-            <h2 class="title"><?php esc_html_e('Markdown export', 'wordpress-static-generator'); ?></h2>
+            <h2 class="title"><?php esc_html_e('Markdown export', 'content2html'); ?></h2>
             <p class="description">
-                <?php esc_html_e('Exports all posts/pages as plain', 'wordpress-static-generator'); ?> <code>.md</code> <?php esc_html_e('files with YAML front matter (title, date, slug) - meant for other systems (Hugo, Jekyll, Eleventy, Obsidian vault etc.),', 'wordpress-static-generator'); ?>
-                <strong><?php esc_html_e('not', 'wordpress-static-generator'); ?></strong> <?php esc_html_e('as a deployable website. Runs independently of SFTP/Netlify; the result is a direct ZIP download.', 'wordpress-static-generator'); ?>
+                <?php esc_html_e('Exports all posts/pages as plain', 'content2html'); ?> <code>.md</code> <?php esc_html_e('files with YAML front matter (title, date, slug) - meant for other systems (Hugo, Jekyll, Eleventy, Obsidian vault etc.),', 'content2html'); ?>
+                <strong><?php esc_html_e('not', 'content2html'); ?></strong> <?php esc_html_e('as a deployable website. Runs independently of SFTP/Netlify; the result is a direct ZIP download.', 'content2html'); ?>
             </p>
             <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
                 <input type="hidden" name="action" value="wpstatic_export_markdown">
@@ -957,14 +957,14 @@ class WPStatic_Settings {
                 <p>
                     <label>
                         <input type="checkbox" name="markdown_localize_images" value="1" checked>
-                        <?php esc_html_e('Download images and rewrite references as relative paths', 'wordpress-static-generator'); ?>
+                        <?php esc_html_e('Download images and rewrite references as relative paths', 'content2html'); ?>
                     </label>
                     <br>
                     <span class="description">
-                        <?php esc_html_e('Enabled: images are additionally included in the ZIP (under', 'wordpress-static-generator'); ?> <code>wp-content/uploads/...</code>), <?php esc_html_e('references become relative - the export then also works without a running WordPress instance. Disabled: image links stay unchanged and keep pointing to your WordPress site.', 'wordpress-static-generator'); ?>
+                        <?php esc_html_e('Enabled: images are additionally included in the ZIP (under', 'content2html'); ?> <code>wp-content/uploads/...</code>), <?php esc_html_e('references become relative - the export then also works without a running WordPress instance. Disabled: image links stay unchanged and keep pointing to your WordPress site.', 'content2html'); ?>
                     </span>
                 </p>
-                <?php submit_button(__('Export as Markdown now', 'wordpress-static-generator'), 'secondary'); ?>
+                <?php submit_button(__('Export as Markdown now', 'content2html'), 'secondary'); ?>
             </form>
             </div>
         </div>

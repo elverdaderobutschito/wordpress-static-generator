@@ -73,7 +73,7 @@ class WPStatic_BatchController {
         $templatePath = $templateOverride ?? $settings['template_path'];
 
         if (empty($templatePath) || !is_file($templatePath)) {
-            throw new RuntimeException(__('No valid template file configured.', 'wordpress-static-generator'));
+            throw new RuntimeException(__('No valid template file configured.', 'content2html'));
         }
 
         $effectiveTemplatePath = $templatePath;

@@ -1,4 +1,8 @@
-# WordPress Static Generator
+# Content2HTML
+
+Use WordPress as a headless CMS without building a WordPress theme.
+Upload your HTML template, define your own injection points, and
+publish the result as a static website.
 
 Generates static HTML files from WordPress content (posts/pages) using
 `WPHeadlessStaticGenerator.php` - directly, internally, via
@@ -11,7 +15,7 @@ directory structure (permalink paths) defined in WordPress.
 1. **`lib/simple_html_dom.php` is already included** - the same version
    used in the `generateStatic.php` setup (classic single-file API:
    `class simple_html_dom`, `str_get_html()`), for consistent behavior
-   between the demo and the plugin (see: https://github.com/elverdaderobutschito/WP-Static-File-Generator).
+   between the demo and the plugin.
 
 2. **phpseclib is already included** (version 3.0.43, sourced directly
    from [github.com/phpseclib/phpseclib](https://github.com/phpseclib/phpseclib),
@@ -31,10 +35,10 @@ directory structure (permalink paths) defined in WordPress.
    Without this constant, the plugin still works (with an automatically
    generated key stored in the database), but that's weaker.
 
-4. Upload the plugin folder to `wp-content/plugins/wordpress-static-generator/` and
+4. Upload the plugin folder to `wp-content/plugins/content2html/` and
    activate it in WordPress.
 
-5. Configure under **Static Deploy** (its own menu item):
+5. Configure under **Content2HTML** (its own menu item):
    - Post types (posts/pages)
    - Upload a template file
    - Rules (data injection, change URL, tidy HTML) - same format as in
@@ -57,9 +61,9 @@ directory structure (permalink paths) defined in WordPress.
 ## Per-page templates
 
 Besides the default template, additional named templates (e.g. "Landing
-page", "Contact") can be uploaded under Static Deploy → "Additional
+page", "Contact") can be uploaded under Content2HTML → "Additional
 templates". When editing a post/page, a dropdown then appears in the
-"Static Deploy" meta box, letting you choose a different template than
+"Content2HTML" meta box, letting you choose a different template than
 the default for just that one page. The selection is applied when the
 page is saved normally (not only when clicking "Deploy").
 
@@ -106,7 +110,7 @@ configurable CSS class (default: `active`).
 
 ## Markdown export
 
-Independent of SFTP/Netlify: under Static Deploy → "Markdown export",
+Independent of SFTP/Netlify: under Content2HTML → "Markdown export",
 one click downloads a ZIP containing all posts/pages as plain `.md`
 files with YAML front matter (title, date, slug, status, excerpt) -
 meant for other systems (Hugo, Jekyll, Eleventy, Obsidian vault,
@@ -120,7 +124,7 @@ extensions).
 
 Without WordPress running in the background, `<form>` tags on the
 generated pages would otherwise just post into the void. Can be enabled
-under Static Deploy → "Forms":
+under Content2HTML → "Forms":
 
 - **Netlify**: forms automatically get `data-netlify="true"` and a
   hidden `form-name` field - Netlify Forms then detects and processes
@@ -173,7 +177,7 @@ addition to the template:
 
 1. Zip your local `assets/` folder - **zip the folder itself, not just
    its contents** (the ZIP root must be a folder named `assets/`).
-2. Upload it under Static Deploy → Assets.
+2. Upload it under Content2HTML → Assets.
 3. The plugin automatically copies the assets into the build folder on
    every generation run. Whether they're actually **uploaded** to the
    target too is controlled by the "Upload assets when deploying"

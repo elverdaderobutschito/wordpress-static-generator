@@ -4,10 +4,10 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-require_once WPSTATIC_DEPLOY_DIR . 'lib/WPHeadlessStaticGenerator.php';
+require_once WPSTATIC_DEPLOY_DIR . 'lib/class-content2html-generator.php';
 
 /**
- * Builds a WPHeadlessStaticGenerator instance that does NOT fetch its
+ * Builds a Content2HTML_Generator instance that does NOT fetch its
  * data via a real HTTP request, but directly through WordPress' internal
  * REST dispatch function rest_do_request(). This returns exactly the
  * same data structure as a real /wp-json/ call (including Yoast fields
@@ -15,22 +15,22 @@ require_once WPSTATIC_DEPLOY_DIR . 'lib/WPHeadlessStaticGenerator.php';
  * but without a network loopback - faster, and it also works on hosting
  * environments that block self-referencing HTTP requests.
  */
-class WPStatic_GeneratorFactory {
+class Content2HTML_GeneratorFactory {
     /**
      * @param string|null $templateOverridePath Optional path to a
-     *        per-page template (see WPStatic_Settings::resolveTemplatePath()).
+     *        per-page template (see Content2HTML_Settings::resolveTemplatePath()).
      *        If null or invalid, the default template is used.
      *
      * @throws RuntimeException if no valid template file can be
      *                          determined.
      */
-    public static function build(string $savePath, ?string $templateOverridePath = null): WPHeadlessStaticGenerator {
-        $settings = WPStatic_Settings::getSettings();
+    public static function build(string $savePath, ?string $templateOverridePath = null): Content2HTML_Generator {
+        $settings = Content2HTML_Settings::getSettings();
 
         $templatePath = $templateOverridePath ?? $settings['template_path'];
 
         if (empty($templatePath) || !is_file($templatePath)) {
-            throw new RuntimeException(__('No valid template file configured.', 'content2html'));
+            throw new RuntimeException(esc_html__('No valid template file configured.', 'content2html'));
         }
 
         // apiUrl is only used as a prefix to work the REST route back out
@@ -38,7 +38,7 @@ class WPStatic_GeneratorFactory {
         // it.
         $apiUrl = rest_url(); // e.g. https://example.com/wp-json/
 
-        $generator = new WPHeadlessStaticGenerator($apiUrl, 'wp/v2', $templatePath);
+        $generator = new Content2HTML_Generator($apiUrl, 'wp/v2', $templatePath);
         $generator->setSavePath($savePath);
         $generator->setKeepOriginalFilename(true); // preserve the directory structure (see point C)
 
@@ -65,7 +65,7 @@ class WPStatic_GeneratorFactory {
 
         $generator->setApiDataProvider([self::class, 'provideData']);
 
-        WPStatic_Forms::applyToGenerator($generator, $settings);
+        Content2HTML_Forms::applyToGenerator($generator, $settings);
 
         return $generator;
     }
@@ -82,14 +82,14 @@ class WPStatic_GeneratorFactory {
      * Without this rule, image URLs would keep pointing unchanged at the
      * WordPress source instance instead of the target (SFTP
      * server/Netlify), where the images are actually uploaded to as well
-     * (see saveImgFiles() in WPHeadlessStaticGenerator.php).
+     * (see saveImgFiles() in class-content2html-generator.php).
      *
      * @return array{0: string[], 1: string[]} [$patterns, $replacements]
      */
     private static function buildAutoDomainRule(): array {
         $home = home_url();
-        $host = parse_url($home, PHP_URL_HOST);
-        $port = parse_url($home, PHP_URL_PORT);
+        $host = wp_parse_url($home, PHP_URL_HOST);
+        $port = wp_parse_url($home, PHP_URL_PORT);
 
         if ($host === null || $host === false) {
             return [[], []];
@@ -102,12 +102,12 @@ class WPStatic_GeneratorFactory {
     }
 
     public static function getDataInjectionRules(): array {
-        $settings = WPStatic_Settings::getSettings();
+        $settings = Content2HTML_Settings::getSettings();
         return self::parseKeyValueRules($settings['data_injection_rules']);
     }
 
     /**
-     * Callback for WPHeadlessStaticGenerator::setApiDataProvider().
+     * Callback for Content2HTML_Generator::setApiDataProvider().
      * Receives the same composed "URL" that the cURL path would build
      * (rest_url() + 'wp/v2/' + endpoint[/id]) and translates it back into
      * a REST route for rest_do_request().
@@ -124,19 +124,19 @@ class WPStatic_GeneratorFactory {
 
         if ($response->is_error()) {
             $error = $response->as_error();
-            throw new WPApiException(sprintf(
+            throw new Content2HTML_ApiException(esc_html(sprintf(
                 /* translators: 1: REST route, 2: error message */
                 __('WP REST route returned an error (%1$s): %2$s', 'content2html'),
                 $route,
                 $error->get_error_message()
-            ));
+            )));
         }
 
         $server = rest_get_server();
         $data = $server->response_to_data($response, false);
 
         // Convert via json_encode/json_decode into the same object
-        // structure that WPHeadlessStaticGenerator would previously have
+        // structure that Content2HTML_Generator would previously have
         // gotten from json_decode() of a real HTTP response (stdClass for
         // a single object, an array of stdClass for a list).
         return json_decode((string) wp_json_encode($data));

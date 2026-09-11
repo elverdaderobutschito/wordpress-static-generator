@@ -12,19 +12,19 @@ if (!defined('ABSPATH')) {
  * README). For a security-relevant library (SSH/crypto), a managed,
  * verifiable source matters more than "saving a few KB".
  */
-class WPStatic_SftpUploader implements WPStatic_Uploader {
+class Content2HTML_SftpUploader implements Content2HTML_Uploader {
     private \phpseclib3\Net\SFTP $sftp;
     private string $remoteBasePath;
 
     public function __construct(array $settings) {
         if (!class_exists(\phpseclib3\Net\SFTP::class)) {
             throw new RuntimeException(
-                __('phpseclib3 was not found. Please run "composer install" in the plugin directory (see README.md) or upload the vendor folder manually.', 'content2html')
+                esc_html__('phpseclib3 was not found. Please run "composer install" in the plugin directory (see README.md) or upload the vendor folder manually.', 'content2html')
             );
         }
 
         if (trim($settings['sftp_host']) === '') {
-            throw new RuntimeException(__('No host specified.', 'content2html'));
+            throw new RuntimeException(esc_html__('No host specified.', 'content2html'));
         }
 
         $this->remoteBasePath = '/' . trim($settings['sftp_remote_base_path'], '/');
@@ -40,18 +40,20 @@ class WPStatic_SftpUploader implements WPStatic_Uploader {
             // "connected, but login rejected" - helps with diagnostics.
             if (!$this->sftp->isConnected()) {
                 throw new RuntimeException(
-                    sprintf(
+                    esc_html(sprintf(
                         /* translators: 1: host, 2: port */
                         __('Could not connect to %1$s:%2$s. Please check host, port and firewall/network.', 'content2html'),
                         $settings['sftp_host'],
                         $settings['sftp_port']
-                    )
+                    ))
                 );
             }
 
             throw new RuntimeException(
-                __('Connected to the server, but login failed. Please check the username and', 'content2html') . ' '
-                . ($settings['sftp_auth_method'] === 'key' ? __('private key/passphrase', 'content2html') : __('password', 'content2html')) . '.'
+                esc_html(
+                    __('Connected to the server, but login failed. Please check the username and', 'content2html') . ' '
+                    . ($settings['sftp_auth_method'] === 'key' ? __('private key/passphrase', 'content2html') : __('password', 'content2html')) . '.'
+                )
             );
         }
     }
@@ -77,34 +79,34 @@ class WPStatic_SftpUploader implements WPStatic_Uploader {
             $this->ensureRemoteDirExists($this->remoteBasePath);
         } catch (Throwable $e) {
             throw new RuntimeException(
-                sprintf(
+                esc_html(sprintf(
                     /* translators: %s: target directory path */
                     __('Target directory "%s" could not be created/found. Please check the path and permissions of the SFTP user.', 'content2html'),
                     $this->remoteBasePath
-                )
+                ))
             );
         }
 
         if (!$this->sftp->is_dir($this->remoteBasePath)) {
             throw new RuntimeException(
-                sprintf(
+                esc_html(sprintf(
                     /* translators: %s: target directory path */
                     __('"%s" exists, but is not a directory. Please check the path.', 'content2html'),
                     $this->remoteBasePath
-                )
+                ))
             );
         }
 
-        $testFile = rtrim($this->remoteBasePath, '/') . '/.wpstatic-connection-test-' . uniqid();
+        $testFile = rtrim($this->remoteBasePath, '/') . '/.content2html-connection-test-' . uniqid();
 
         if (!$this->sftp->put($testFile, 'content2html connection test', \phpseclib3\Net\SFTP::SOURCE_STRING)) {
             throw new RuntimeException(
-                sprintf(
+                esc_html(sprintf(
                     /* translators: 1: target directory path, 2: SFTP error */
                     __('Connection/login successful, but "%1$s" is not writable (%2$s). Please check the directory permissions for the SFTP user.', 'content2html'),
                     $this->remoteBasePath,
                     $this->sftp->getLastSFTPError()
-                )
+                ))
             );
         }
 
@@ -121,12 +123,12 @@ class WPStatic_SftpUploader implements WPStatic_Uploader {
 
         if (!$ok) {
             throw new RuntimeException(
-                sprintf(
+                esc_html(sprintf(
                     /* translators: 1: relative file path, 2: SFTP error */
                     __('Could not transfer file via SFTP: %1$s (%2$s)', 'content2html'),
                     $relativePath,
                     $this->sftp->getLastSFTPError()
-                )
+                ))
             );
         }
     }
@@ -152,8 +154,8 @@ class WPStatic_SftpUploader implements WPStatic_Uploader {
     }
 
     /**
-     * phpseclib bietet kein natives "mkdir -p" - Verzeichnisebenen also
-     * einzeln anlegen und bereits existierende Verzeichnisse ignorieren.
+     * phpseclib doesn't offer a native "mkdir -p" - so create directory
+     * levels one by one and ignore ones that already exist.
      */
     private function ensureRemoteDirExists(string $remoteDir): void {
         $parts = explode('/', trim($remoteDir, '/'));

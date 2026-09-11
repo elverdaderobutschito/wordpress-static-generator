@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) {
  * SFTP/Netlify because of this - the result is a ZIP to download, not a
  * deploy target.
  */
-class WPStatic_MarkdownExport {
+class Content2HTML_MarkdownExport {
     /**
      * @return string Absolute path to the generated ZIP file.
      */
@@ -39,7 +39,7 @@ class WPStatic_MarkdownExport {
 
         $zipPath = rtrim($exportDir, '/') . '.zip';
         self::zipDirectory($exportDir, $zipPath);
-        self::rrmdir($exportDir);
+        Content2HTML_Filesystem::deleteDir($exportDir);
 
         return $zipPath;
     }
@@ -103,7 +103,7 @@ class WPStatic_MarkdownExport {
      * directory.
      */
     private static function localizeImages(string $html, string $exportDir): string {
-        $homeHost = parse_url(home_url(), PHP_URL_HOST);
+        $homeHost = wp_parse_url(home_url(), PHP_URL_HOST);
 
         if (!$homeHost) {
             return $html;
@@ -114,11 +114,11 @@ class WPStatic_MarkdownExport {
             function (array $matches) use ($exportDir, $homeHost) {
                 [$full, $before, $src, $after] = $matches;
 
-                if (parse_url($src, PHP_URL_HOST) !== $homeHost) {
+                if (wp_parse_url($src, PHP_URL_HOST) !== $homeHost) {
                     return $full; // foreign domain - leave unchanged
                 }
 
-                $path = parse_url($src, PHP_URL_PATH);
+                $path = wp_parse_url($src, PHP_URL_PATH);
 
                 if (!$path) {
                     return $full;
@@ -174,25 +174,4 @@ class WPStatic_MarkdownExport {
         return $zip->close();
     }
 
-    private static function rrmdir(string $dir): void {
-        if (!is_dir($dir)) {
-            return;
-        }
-
-        foreach (scandir($dir) as $object) {
-            if ($object === '.' || $object === '..') {
-                continue;
-            }
-
-            $path = $dir . '/' . $object;
-
-            if (is_dir($path) && !is_link($path)) {
-                self::rrmdir($path);
-            } else {
-                unlink($path);
-            }
-        }
-
-        rmdir($dir);
-    }
 }

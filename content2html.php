@@ -30,13 +30,20 @@ define('WPSTATIC_DEPLOY_VERSION', '1.0.0');
 define('WPSTATIC_DEPLOY_DIR', plugin_dir_path(__FILE__));
 define('WPSTATIC_DEPLOY_URL', plugin_dir_url(__FILE__));
 
-add_action('plugins_loaded', function () {
+// Hooked on init rather than plugins_loaded, per current WordPress.org
+// guidance (loading translations on plugins_loaded happens too early
+// for some newer WordPress i18n internals). Kept at all (rather than
+// removed) because this plugin is also distributed outside
+// WordPress.org (GitHub), where the automatic per-plugin translation
+// loading WordPress.org provides doesn't apply - there, this is what
+// makes the bundled languages/content2html-de_DE.mo file work.
+add_action('init', function () {
     load_plugin_textdomain('content2html', false, dirname(plugin_basename(__FILE__)) . '/languages');
 });
 
 // -----------------------------------------------------------------------
 // Guard checks FIRST, before anything is loaded that transitively depends
-// on them. WPHeadlessStaticGenerator.php unconditionally requires
+// on them. class-content2html-generator.php unconditionally requires
 // simple_html_dom.php - if this check ran later (e.g. on plugins_loaded),
 // the file would already have failed fatally before the check ever got a
 // chance to run.
@@ -66,22 +73,23 @@ if (file_exists(WPSTATIC_DEPLOY_DIR . 'vendor/autoload.php')) {
     require_once WPSTATIC_DEPLOY_DIR . 'vendor/autoload.php';
 }
 
-require_once WPSTATIC_DEPLOY_DIR . 'includes/class-wpstatic-crypto.php';
-require_once WPSTATIC_DEPLOY_DIR . 'includes/class-wpstatic-settings.php';
-require_once WPSTATIC_DEPLOY_DIR . 'includes/class-wpstatic-generator-factory.php';
-require_once WPSTATIC_DEPLOY_DIR . 'includes/class-wpstatic-assets-manager.php';
-require_once WPSTATIC_DEPLOY_DIR . 'includes/class-wpstatic-forms.php';
-require_once WPSTATIC_DEPLOY_DIR . 'includes/class-wpstatic-markdown-export.php';
-require_once WPSTATIC_DEPLOY_DIR . 'includes/class-wpstatic-navigation.php';
-require_once WPSTATIC_DEPLOY_DIR . 'includes/interface-wpstatic-uploader.php';
-require_once WPSTATIC_DEPLOY_DIR . 'includes/class-wpstatic-sftp-uploader.php';
-require_once WPSTATIC_DEPLOY_DIR . 'includes/class-wpstatic-netlify-uploader.php';
-require_once WPSTATIC_DEPLOY_DIR . 'includes/class-wpstatic-batch-controller.php';
-require_once WPSTATIC_DEPLOY_DIR . 'includes/class-wpstatic-ajax.php';
-require_once WPSTATIC_DEPLOY_DIR . 'includes/class-wpstatic-metabox.php';
+require_once WPSTATIC_DEPLOY_DIR . 'includes/class-content2html-filesystem.php';
+require_once WPSTATIC_DEPLOY_DIR . 'includes/class-content2html-crypto.php';
+require_once WPSTATIC_DEPLOY_DIR . 'includes/class-content2html-settings.php';
+require_once WPSTATIC_DEPLOY_DIR . 'includes/class-content2html-generator-factory.php';
+require_once WPSTATIC_DEPLOY_DIR . 'includes/class-content2html-assets-manager.php';
+require_once WPSTATIC_DEPLOY_DIR . 'includes/class-content2html-forms.php';
+require_once WPSTATIC_DEPLOY_DIR . 'includes/class-content2html-markdown-export.php';
+require_once WPSTATIC_DEPLOY_DIR . 'includes/class-content2html-navigation.php';
+require_once WPSTATIC_DEPLOY_DIR . 'includes/interface-content2html-uploader.php';
+require_once WPSTATIC_DEPLOY_DIR . 'includes/class-content2html-sftp-uploader.php';
+require_once WPSTATIC_DEPLOY_DIR . 'includes/class-content2html-netlify-uploader.php';
+require_once WPSTATIC_DEPLOY_DIR . 'includes/class-content2html-batch-controller.php';
+require_once WPSTATIC_DEPLOY_DIR . 'includes/class-content2html-ajax.php';
+require_once WPSTATIC_DEPLOY_DIR . 'includes/class-content2html-metabox.php';
 
 add_action('plugins_loaded', function () {
-    new WPStatic_Settings();
-    new WPStatic_AjaxController();
-    new WPStatic_MetaBox();
+    new Content2HTML_Settings();
+    new Content2HTML_AjaxController();
+    new Content2HTML_MetaBox();
 });

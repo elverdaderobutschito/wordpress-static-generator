@@ -31,7 +31,7 @@ if (strpos($RECIPIENT, '{{') === 0) {
     exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+if (!isset($_SERVER['REQUEST_METHOD']) || $_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     header('Content-Type: text/plain; charset=utf-8');
     exit('Method Not Allowed');
@@ -43,8 +43,16 @@ function wpstatic_form_redirect_or_success(string $redirectUrl): void {
         exit;
     }
 
-    if (!empty($_SERVER['HTTP_REFERER'])) {
-        header('Location: ' . wpstatic_add_sent_param($_SERVER['HTTP_REFERER']));
+    // No WordPress functions available here (this file runs outside
+    // WordPress, on the deployed target server) - sanitize the referer
+    // with plain PHP: strip control characters (CRLF/header-injection
+    // protection) and validate it is a well-formed http(s) URL before
+    // ever using it in a redirect header.
+    $referer = isset($_SERVER['HTTP_REFERER']) ? preg_replace('/[\r\n\x00-\x1F]/', '', (string) $_SERVER['HTTP_REFERER']) : '';
+    $referer = filter_var($referer, FILTER_VALIDATE_URL) !== false ? $referer : '';
+
+    if ($referer !== '') {
+        header('Location: ' . wpstatic_add_sent_param($referer));
         exit;
     }
 

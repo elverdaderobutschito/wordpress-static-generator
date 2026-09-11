@@ -6,16 +6,22 @@ if (!defined('ABSPATH')) {
     exit; // Prevent direct access (required by the WP.org Plugin Check tool)
 }
 
-require_once __DIR__ . '/simple_html_dom.php';
+// Guard against a fatal "Cannot redeclare class" error if another active
+// plugin has already bundled and loaded its own copy of simplehtmldom
+// (a fairly commonly used library) - simply skip loading ours in that
+// case, since the class/function names are identical either way.
+if (!class_exists('simple_html_dom', false)) {
+    require_once __DIR__ . '/simple_html_dom.php';
+}
 
 /**
- * WPHeadlessStaticGenerator
+ * Content2HTML_Generator
  *
  * Uses the WordPress REST API as a headless CMS source and generates
  * static HTML from it using a template with placeholders.
  *
  * USAGE:
- *   $generator = new WPHeadlessStaticGenerator(
+ *   $generator = new Content2HTML_Generator(
  *       'https://example.com/wp-json/wp/v2/',
  *       'posts',
  *       '/path/to/article_template.html'
@@ -32,7 +38,7 @@ require_once __DIR__ . '/simple_html_dom.php';
  *
  * CHANGELOG (compared to the original version):
  *  1. callWPApi() now checks the cURL error and HTTP status code and
- *     throws a WPApiException instead of silently returning null/broken
+ *     throws a Content2HTML_ApiException instead of silently returning null/broken
  *     data. Previously a network error could let injectSingle() continue
  *     with $arrData == null and fail with a confusing fatal error.
  *  2. setFileOwner()/chown() now only runs in a CLI context - in a web
@@ -53,10 +59,10 @@ require_once __DIR__ . '/simple_html_dom.php';
  *  7. tidyHtml() now cleans up the simple_html_dom tree in a finally
  *     block, even if one of the find() loops throws an exception.
  */
-class WPApiException extends RuntimeException {
+class Content2HTML_ApiException extends RuntimeException {
 }
 
-class WPHeadlessStaticGenerator {
+class Content2HTML_Generator {
     private string $apiUrl;
     private string $apiEndpointTopRoute;
     private string $templatePath;
@@ -87,10 +93,10 @@ class WPHeadlessStaticGenerator {
         $this->setApiEndpointTopRoute($apiEndpointTopRoute);
         $this->setTemplatePath($templatePath);
 
-        $host = parse_url($apiUrl, PHP_URL_HOST);
+        $host = wp_parse_url($apiUrl, PHP_URL_HOST);
 
         if ($host === null || $host === false) {
-            throw new InvalidArgumentException("Could not determine host from API URL: {$apiUrl}");
+            throw new InvalidArgumentException(esc_html("Could not determine host from API URL: {$apiUrl}"));
         }
 
         $this->originalDomain = $host;
@@ -203,7 +209,7 @@ class WPHeadlessStaticGenerator {
     }
 
     /**
-     * @throws WPApiException if the WP API is unreachable or does not
+     * @throws Content2HTML_ApiException if the WP API is unreachable or does not
      *                         return usable JSON.
      *
      * @return string[] Absolute paths of all files written during this
@@ -237,7 +243,7 @@ class WPHeadlessStaticGenerator {
         $template = file_get_contents($this->templatePath);
 
         if ($template === false) {
-            throw new RuntimeException("Could not read template: {$this->templatePath}");
+            throw new RuntimeException(esc_html("Could not read template: {$this->templatePath}"));
         }
 
         $template = $this->ensureBaseHrefTag($template);
@@ -258,8 +264,8 @@ class WPHeadlessStaticGenerator {
         $template = $this->tidyHtml($template);
 
         $dir = dirname($pathToFile);
-        if (!is_dir($dir) && !mkdir($dir, 0775, true) && !is_dir($dir)) {
-            throw new RuntimeException("Could not create target directory: {$dir}");
+        if (!is_dir($dir) && !Content2HTML_Filesystem::mkdir($dir) && !is_dir($dir)) {
+            throw new RuntimeException(esc_html("Could not create target directory: {$dir}"));
         }
 
         file_put_contents($pathToFile, $template);
@@ -269,7 +275,7 @@ class WPHeadlessStaticGenerator {
         // without root) - so only attempt it in a CLI context instead of
         // swallowing the error with @.
         if ($this->fileOwner !== null && PHP_SAPI === 'cli') {
-            chown($pathToFile, $this->fileOwner);
+            Content2HTML_Filesystem::chown($pathToFile, $this->fileOwner);
         }
     }
 
@@ -340,7 +346,7 @@ class WPHeadlessStaticGenerator {
             return '/' . $arrData->slug . '.html';
         }
 
-        $parseUrl = parse_url($arrData->link);
+        $parseUrl = wp_parse_url($arrData->link);
         $path = $parseUrl['path'] ?? '/';
 
         // "Plain" permalinks (WordPress' "Plain" setting) link posts/pages
@@ -362,7 +368,7 @@ class WPHeadlessStaticGenerator {
             $dir = $this->savePath . $path;
 
             if (!is_dir($dir)) {
-                mkdir($dir, 0775, true);
+                Content2HTML_Filesystem::mkdir($dir);
             }
 
             // rtrim() + explicit slash: works regardless of whether $path
@@ -378,7 +384,7 @@ class WPHeadlessStaticGenerator {
         $dir = $this->savePath . str_replace('/' . $pathInfo['basename'], '', $path);
 
         if (!is_dir($dir)) {
-            mkdir($dir, 0775, true);
+            Content2HTML_Filesystem::mkdir($dir);
         }
 
         return $path;
@@ -584,7 +590,7 @@ class WPHeadlessStaticGenerator {
     }
 
     private function tidyHtml(string $template): string {
-        $html = str_get_html($template);
+        $html = content2html_str_get_html($template);
 
         if ($html === false) {
             // Template wasn't valid HTML - return it unchanged instead of
@@ -699,14 +705,14 @@ class WPHeadlessStaticGenerator {
     }
 
     private function saveImgFiles(string $src, string $newFolder): void {
-        $parseUrl = parse_url($newFolder);
+        $parseUrl = wp_parse_url($newFolder);
         $pathInfo = pathinfo($parseUrl['path'] ?? '');
         $filename = $pathInfo['basename'] ?? basename($parseUrl['path'] ?? $newFolder);
 
         $createPath = $this->savePath . ($pathInfo['dirname'] ?? '');
 
-        if (!is_dir($createPath) && !mkdir($createPath, 0775, true) && !is_dir($createPath)) {
-            throw new RuntimeException("Could not create image directory: {$createPath}");
+        if (!is_dir($createPath) && !Content2HTML_Filesystem::mkdir($createPath) && !is_dir($createPath)) {
+            throw new RuntimeException(esc_html("Could not create image directory: {$createPath}"));
         }
 
         $target = $createPath . '/' . $filename;
@@ -714,7 +720,7 @@ class WPHeadlessStaticGenerator {
         if (@copy($src, $target) === false) {
             // Deliberately not a hard failure - a single missing image
             // shouldn't stop the entire build, but it should be visible.
-            trigger_error("Could not copy image: {$src} -> {$target}", E_USER_WARNING);
+            trigger_error(esc_html("Could not copy image: {$src} -> {$target}"), E_USER_WARNING);
         } else {
             $this->writtenFiles[] = $target;
         }
@@ -755,25 +761,7 @@ class WPHeadlessStaticGenerator {
     }
 
     /**
-     * Closes a cURL handle - safe across PHP versions.
-     *
-     * Since PHP 8.0, cURL handles are objects (CurlHandle) rather than
-     * resources and are freed automatically when they go out of scope;
-     * curl_close() has done nothing since then and is officially marked
-     * deprecated as of PHP 8.5 (scheduled for removal in PHP 9). On PHP
-     * 7.4 (see "Requires PHP" in the plugin header), however, the call is
-     * still necessary, since cURL handles are still real resources there.
-     * No type hint is possible on the parameter, since "resource"
-     * (PHP 7.4) and "CurlHandle" (PHP 8+) are mutually exclusive.
-     */
-    private static function closeCurlHandle($curl): void {
-        if (PHP_VERSION_ID < 80000) {
-            curl_close($curl);
-        }
-    }
-
-    /**
-     * @throws WPApiException on a network error, non-2xx status, or
+     * @throws Content2HTML_ApiException on a network error, non-2xx status, or
      *                         invalid JSON.
      */
     private function callWPApi(string $url) {
@@ -781,38 +769,36 @@ class WPHeadlessStaticGenerator {
             return ($this->apiDataProvider)($url);
         }
 
-        $curl = curl_init($url);
-
-        curl_setopt_array($curl, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT => 15,
-            CURLOPT_FOLLOWLOCATION => true,
+        // Fallback used only if no data provider was explicitly set (see
+        // setApiDataProvider()) - not exercised by this plugin itself,
+        // which always supplies one (see
+        // Content2HTML_GeneratorFactory::build()). This file only ever
+        // executes inside WordPress (see the ABSPATH guard above), so
+        // wp_remote_get() is always available here.
+        $response = wp_remote_get($url, [
+            'timeout' => 15,
         ]);
 
-        $result = curl_exec($curl);
-
-        if ($result === false) {
-            $error = curl_error($curl);
-            self::closeCurlHandle($curl);
-            throw new WPApiException("WP API request failed ({$url}): {$error}");
+        if (is_wp_error($response)) {
+            throw new Content2HTML_ApiException(esc_html("WP API request failed ({$url}): " . $response->get_error_message()));
         }
 
-        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        self::closeCurlHandle($curl);
+        $httpCode = wp_remote_retrieve_response_code($response);
+        $body = wp_remote_retrieve_body($response);
 
         if ($httpCode < 200 || $httpCode >= 300) {
-            throw new WPApiException("WP API responded with HTTP {$httpCode} ({$url})");
+            throw new Content2HTML_ApiException(esc_html("WP API responded with HTTP {$httpCode} ({$url})"));
         }
 
-        $decoded = json_decode($result);
+        $decoded = json_decode($body);
 
         if ($decoded === null && json_last_error() !== JSON_ERROR_NONE) {
-            throw new WPApiException(sprintf(
+            throw new Content2HTML_ApiException(esc_html(sprintf(
                 /* translators: 1: request URL, 2: JSON error message */
                 __('WP API did not return valid JSON (%1$s): %2$s', 'content2html'),
                 $url,
                 json_last_error_msg()
-            ));
+            )));
         }
 
         return $decoded;
@@ -825,7 +811,12 @@ class WPHeadlessStaticGenerator {
 
         $timestamp = strtotime($originalDate);
 
-        return $timestamp === false ? $originalDate : date($this->dateFormat, $timestamp);
+        // wp_date() (rather than date()) respects the timezone configured
+        // in WordPress (Settings -> General), instead of silently using
+        // whatever timezone the server itself happens to be set to -
+        // those can differ, and $originalDate is a post's publish date
+        // meant for display, not an internal/log timestamp.
+        return $timestamp === false ? $originalDate : wp_date($this->dateFormat, $timestamp);
     }
 
     private function checkTrailingSlash(string $path): string {

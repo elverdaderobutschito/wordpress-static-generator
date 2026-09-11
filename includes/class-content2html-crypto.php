@@ -25,7 +25,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class WPStatic_Crypto {
+class Content2HTML_Crypto {
     private const CIPHER = 'aes-256-cbc';
     private const FALLBACK_KEY_OPTION = 'wpstatic_deploy_fallback_key';
 

@@ -4,7 +4,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-interface WPStatic_Uploader {
+interface Content2HTML_Uploader {
     /**
      * Uploads a single file to the target.
      *

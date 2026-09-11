@@ -43,13 +43,13 @@ define('HDOM_INFO_INNER', 5);
 define('HDOM_INFO_OUTER', 6);
 define('HDOM_INFO_ENDSPACE', 7);
 
-defined('DEFAULT_TARGET_CHARSET') || define('DEFAULT_TARGET_CHARSET', 'UTF-8');
-defined('DEFAULT_BR_TEXT') || define('DEFAULT_BR_TEXT', "\r\n");
-defined('DEFAULT_SPAN_TEXT') || define('DEFAULT_SPAN_TEXT', ' ');
+defined('CONTENT2HTML_DEFAULT_TARGET_CHARSET') || define('CONTENT2HTML_DEFAULT_TARGET_CHARSET', 'UTF-8');
+defined('CONTENT2HTML_DEFAULT_BR_TEXT') || define('CONTENT2HTML_DEFAULT_BR_TEXT', "\r\n");
+defined('CONTENT2HTML_DEFAULT_SPAN_TEXT') || define('CONTENT2HTML_DEFAULT_SPAN_TEXT', ' ');
 defined('MAX_FILE_SIZE') || define('MAX_FILE_SIZE', 600000);
 define('HDOM_SMARTY_AS_TEXT', 1);
 
-function file_get_html(
+function content2html_file_get_html(
 	$url,
 	$use_include_path = false,
 	$context = null,
@@ -57,10 +57,10 @@ function file_get_html(
 	$maxLen = -1,
 	$lowercase = true,
 	$forceTagsClosed = true,
-	$target_charset = DEFAULT_TARGET_CHARSET,
+	$target_charset = CONTENT2HTML_DEFAULT_TARGET_CHARSET,
 	$stripRN = true,
-	$defaultBRText = DEFAULT_BR_TEXT,
-	$defaultSpanText = DEFAULT_SPAN_TEXT)
+	$defaultBRText = CONTENT2HTML_DEFAULT_BR_TEXT,
+	$defaultSpanText = CONTENT2HTML_DEFAULT_SPAN_TEXT)
 {
 	if($maxLen <= 0) { $maxLen = MAX_FILE_SIZE; }
 
@@ -95,14 +95,14 @@ function file_get_html(
 	return $dom->load($contents, $lowercase, $stripRN);
 }
 
-function str_get_html(
+function content2html_str_get_html(
 	$str,
 	$lowercase = true,
 	$forceTagsClosed = true,
-	$target_charset = DEFAULT_TARGET_CHARSET,
+	$target_charset = CONTENT2HTML_DEFAULT_TARGET_CHARSET,
 	$stripRN = true,
-	$defaultBRText = DEFAULT_BR_TEXT,
-	$defaultSpanText = DEFAULT_SPAN_TEXT)
+	$defaultBRText = CONTENT2HTML_DEFAULT_BR_TEXT,
+	$defaultSpanText = CONTENT2HTML_DEFAULT_SPAN_TEXT)
 {
 	$dom = new simple_html_dom(
 		null,
@@ -122,7 +122,7 @@ function str_get_html(
 	return $dom->load($str, $lowercase, $stripRN);
 }
 
-function dump_html_tree($node, $show_attr = true, $deep = 0)
+function content2html_dump_html_tree($node, $show_attr = true, $deep = 0)
 {
 	$node->dump($node);
 }
@@ -165,12 +165,13 @@ class simple_html_dom_node
 
 	function dump($show_attr = true, $depth = 0)
 	{
-		echo str_repeat("\t", $depth) . $this->tag;
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $this->tag is escaped via esc_html() below; str_repeat() only produces tab characters.
+		echo str_repeat("\t", $depth) . esc_html((string) $this->tag);
 
 		if ($show_attr && count($this->attr) > 0) {
 			echo '(';
 			foreach ($this->attr as $k => $v) {
-				echo "[$k]=>\"$v\", ";
+				echo '[' . esc_html((string) $k) . ']=>"' . esc_html((string) $v) . '", ';
 			}
 			echo ')';
 		}
@@ -186,12 +187,12 @@ class simple_html_dom_node
 
 	function dump_node($echo = true)
 	{
-		$string = $this->tag;
+		$string = esc_html((string) $this->tag);
 
 		if (count($this->attr) > 0) {
 			$string .= '(';
 			foreach ($this->attr as $k => $v) {
-				$string .= "[$k]=>\"$v\", ";
+				$string .= '[' . esc_html((string) $k) . ']=>"' . esc_html((string) $v) . '", ';
 			}
 			$string .= ')';
 		}
@@ -200,26 +201,26 @@ class simple_html_dom_node
 			$string .= ' $_ (';
 			foreach ($this->_ as $k => $v) {
 				if (is_array($v)) {
-					$string .= "[$k]=>(";
+					$string .= '[' . esc_html((string) $k) . ']=>(';
 					foreach ($v as $k2 => $v2) {
-						$string .= "[$k2]=>\"$v2\", ";
+						$string .= '[' . esc_html((string) $k2) . ']=>"' . esc_html((string) $v2) . '", ';
 					}
 					$string .= ')';
 				} else {
-					$string .= "[$k]=>\"$v\", ";
+					$string .= '[' . esc_html((string) $k) . ']=>"' . esc_html((string) $v) . '", ';
 				}
 			}
 			$string .= ')';
 		}
 
 		if (isset($this->text)) {
-			$string .= " text: ({$this->text})";
+			$string .= ' text: (' . esc_html((string) $this->text) . ')';
 		}
 
 		$string .= ' HDOM_INNER_INFO: ';
 
 		if (isset($node->_[HDOM_INFO_INNER])) {
-			$string .= "'" . $node->_[HDOM_INFO_INNER] . "'";
+			$string .= "'" . esc_html((string) $node->_[HDOM_INFO_INNER]) . "'";
 		} else {
 			$string .= ' NULL ';
 		}
@@ -230,6 +231,7 @@ class simple_html_dom_node
 		$string .= "\n";
 
 		if ($echo) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $string is built up above from already-esc_html()-escaped parts (the static analyzer can't trace escaping across that many lines); this debug method is never called anywhere in this plugin.
 			echo $string;
 			return;
 		} else {
@@ -1465,10 +1467,10 @@ class simple_html_dom
 		$str = null,
 		$lowercase = true,
 		$forceTagsClosed = true,
-		$target_charset = DEFAULT_TARGET_CHARSET,
+		$target_charset = CONTENT2HTML_DEFAULT_TARGET_CHARSET,
 		$stripRN = true,
-		$defaultBRText = DEFAULT_BR_TEXT,
-		$defaultSpanText = DEFAULT_SPAN_TEXT,
+		$defaultBRText = CONTENT2HTML_DEFAULT_BR_TEXT,
+		$defaultSpanText = CONTENT2HTML_DEFAULT_SPAN_TEXT,
 		$options = 0)
 	{
 		if ($str) {
@@ -1503,8 +1505,8 @@ class simple_html_dom
 		$str,
 		$lowercase = true,
 		$stripRN = true,
-		$defaultBRText = DEFAULT_BR_TEXT,
-		$defaultSpanText = DEFAULT_SPAN_TEXT,
+		$defaultBRText = CONTENT2HTML_DEFAULT_BR_TEXT,
+		$defaultSpanText = CONTENT2HTML_DEFAULT_SPAN_TEXT,
 		$options = 0)
 	{
 		global $debug_object;
@@ -1626,8 +1628,8 @@ class simple_html_dom
 
 	protected function prepare(
 		$str, $lowercase = true,
-		$defaultBRText = DEFAULT_BR_TEXT,
-		$defaultSpanText = DEFAULT_SPAN_TEXT)
+		$defaultBRText = CONTENT2HTML_DEFAULT_BR_TEXT,
+		$defaultSpanText = CONTENT2HTML_DEFAULT_SPAN_TEXT)
 	{
 		$this->clear();
 
@@ -2321,12 +2323,12 @@ class simple_html_dom
 
 	function createElement($name, $value = null)
 	{
-		return @str_get_html("<$name>$value</$name>")->firstChild();
+		return @content2html_str_get_html("<$name>$value</$name>")->firstChild();
 	}
 
 	function createTextNode($value)
 	{
-		return @end(str_get_html($value)->nodes);
+		return @end(content2html_str_get_html($value)->nodes);
 	}
 
 	function getElementById($id)

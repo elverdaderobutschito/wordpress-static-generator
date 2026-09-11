@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
  *  - SFTP (classic PHP hosting): the form's action is rewritten to a
  *    bundled PHP handler that emails the submitted data.
  */
-class WPStatic_Forms {
+class Content2HTML_Forms {
     private const HANDLER_TEMPLATE_PATH = WPSTATIC_DEPLOY_DIR . 'includes/form-handler-template.php';
     private const HANDLER_FILENAME = 'form-handler.php';
     private const VALIDATION_SCRIPT_SOURCE = WPSTATIC_DEPLOY_DIR . 'includes/form-validate.js';
@@ -27,7 +27,7 @@ class WPStatic_Forms {
      * Configures the generator to match the current target and form
      * settings. No-op if forms are not enabled.
      */
-    public static function applyToGenerator(WPHeadlessStaticGenerator $generator, array $settings): void {
+    public static function applyToGenerator(Content2HTML_Generator $generator, array $settings): void {
         if (empty($settings['forms_enabled'])) {
             return;
         }
@@ -73,7 +73,7 @@ class WPStatic_Forms {
      * capture (the form appears to "work", but never shows up in
      * Netlify's Forms overview). Such a case is already flagged with a
      * warning when saving the settings (see
-     * WPStatic_Settings::handleSave()), and additionally guarded against
+     * Content2HTML_Settings::handleSave()), and additionally guarded against
      * here at runtime, in case the faulty setting was saved anyway.
      */
     private static function safeguardNetlifyRedirect(string $redirectUrl): string {
@@ -81,8 +81,8 @@ class WPStatic_Forms {
             return '';
         }
 
-        $redirectHost = parse_url($redirectUrl, PHP_URL_HOST);
-        $ownHost = parse_url(home_url(), PHP_URL_HOST);
+        $redirectHost = wp_parse_url($redirectUrl, PHP_URL_HOST);
+        $ownHost = wp_parse_url(home_url(), PHP_URL_HOST);
 
         if ($redirectHost !== null && $redirectHost === $ownHost) {
             return ''; // ignore it -> the generator removes the action, the form submits to itself

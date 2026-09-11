@@ -4,17 +4,17 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class WPStatic_BatchController {
+class Content2HTML_BatchController {
     public static function getBuildDir(): string {
         $upload = wp_upload_dir();
-        return trailingslashit($upload['basedir']) . 'wpstatic-build';
+        return trailingslashit($upload['basedir']) . 'content2html-build';
     }
 
     /**
      * @return array<int, array{id:int, post_type:string}>
      */
     public static function buildQueue(): array {
-        $settings = WPStatic_Settings::getSettings();
+        $settings = Content2HTML_Settings::getSettings();
 
         $ids = get_posts([
             'post_type' => $settings['post_types'],
@@ -37,7 +37,7 @@ class WPStatic_BatchController {
         $dir = self::getBuildDir();
 
         if (is_dir($dir)) {
-            self::rrmdir($dir);
+            Content2HTML_Filesystem::deleteDir($dir);
         }
 
         wp_mkdir_p($dir);
@@ -66,14 +66,14 @@ class WPStatic_BatchController {
             wp_mkdir_p($buildDir);
         }
 
-        $settings = WPStatic_Settings::getSettings();
+        $settings = Content2HTML_Settings::getSettings();
 
         $templateId = (string) get_post_meta($postId, '_wpstatic_template_id', true);
-        $templateOverride = WPStatic_Settings::resolveTemplatePath($templateId);
+        $templateOverride = Content2HTML_Settings::resolveTemplatePath($templateId);
         $templatePath = $templateOverride ?? $settings['template_path'];
 
         if (empty($templatePath) || !is_file($templatePath)) {
-            throw new RuntimeException(__('No valid template file configured.', 'content2html'));
+            throw new RuntimeException(esc_html__('No valid template file configured.', 'content2html'));
         }
 
         $effectiveTemplatePath = $templatePath;
@@ -82,7 +82,7 @@ class WPStatic_BatchController {
         if (!empty($settings['nav_main_enabled']) || !empty($settings['nav_footer_enabled'])) {
             $templateContent = file_get_contents($templatePath);
             $currentUrl = (string) get_permalink($postId);
-            $renderedContent = WPStatic_Navigation::renderTemplate($templateContent, $currentUrl, $settings);
+            $renderedContent = Content2HTML_Navigation::renderTemplate($templateContent, $currentUrl, $settings);
 
             $tempTemplatePath = self::getTempDir() . '/nav-template-' . $postId . '-' . uniqid() . '.html';
             file_put_contents($tempTemplatePath, $renderedContent);
@@ -90,16 +90,16 @@ class WPStatic_BatchController {
         }
 
         try {
-            $generator = WPStatic_GeneratorFactory::build($buildDir, $effectiveTemplatePath);
+            $generator = Content2HTML_GeneratorFactory::build($buildDir, $effectiveTemplatePath);
             $restBase = self::restBaseForPostType($postType);
 
             $writtenAbsolutePaths = $generator->injectDataIntoTemplate(
                 $restBase . '/' . $postId,
-                WPStatic_GeneratorFactory::getDataInjectionRules()
+                Content2HTML_GeneratorFactory::getDataInjectionRules()
             );
         } finally {
             if ($tempTemplatePath !== null && is_file($tempTemplatePath)) {
-                unlink($tempTemplatePath);
+                Content2HTML_Filesystem::deleteFile($tempTemplatePath);
             }
         }
 
@@ -120,7 +120,7 @@ class WPStatic_BatchController {
      * uploaded.
      */
     private static function getTempDir(): string {
-        $dir = wp_upload_dir()['basedir'] . '/wpstatic-tmp';
+        $dir = wp_upload_dir()['basedir'] . '/content2html-tmp';
 
         if (!is_dir($dir)) {
             wp_mkdir_p($dir);
@@ -129,12 +129,12 @@ class WPStatic_BatchController {
         return $dir;
     }
 
-    public static function buildUploader(): WPStatic_Uploader {
-        $settings = WPStatic_Settings::getSettings();
+    public static function buildUploader(): Content2HTML_Uploader {
+        $settings = Content2HTML_Settings::getSettings();
 
         return $settings['target'] === 'netlify'
-            ? new WPStatic_NetlifyUploader($settings)
-            : new WPStatic_SftpUploader($settings);
+            ? new Content2HTML_NetlifyUploader($settings)
+            : new Content2HTML_SftpUploader($settings);
     }
 
     /**
@@ -152,19 +152,19 @@ class WPStatic_BatchController {
             return;
         }
 
-        WPStatic_AssetsManager::copyToBuild(self::getBuildDir());
+        Content2HTML_AssetsManager::copyToBuild(self::getBuildDir());
     }
 
     /**
      * Generates the PHP form handler in the build directory (only
      * relevant for an SFTP target with forms enabled, see
-     * WPStatic_Forms::buildHandlerFile()) as well as the client-side
+     * Content2HTML_Forms::buildHandlerFile()) as well as the client-side
      * validation script (both targets, see buildValidationScript()).
      */
     public static function buildFormHandler(): void {
-        $settings = WPStatic_Settings::getSettings();
-        WPStatic_Forms::buildHandlerFile(self::getBuildDir(), $settings);
-        WPStatic_Forms::buildValidationScript(self::getBuildDir(), $settings);
+        $settings = Content2HTML_Settings::getSettings();
+        Content2HTML_Forms::buildHandlerFile(self::getBuildDir(), $settings);
+        Content2HTML_Forms::buildValidationScript(self::getBuildDir(), $settings);
     }
 
     /**
@@ -181,7 +181,7 @@ class WPStatic_BatchController {
     }
 
     public static function assetsEverUploadedForCurrentTarget(): bool {
-        $settings = WPStatic_Settings::getSettings();
+        $settings = Content2HTML_Settings::getSettings();
         $hash = self::targetIdentityHash($settings);
         $marker = (array) get_option('wpstatic_assets_uploaded_targets', []);
 
@@ -189,7 +189,7 @@ class WPStatic_BatchController {
     }
 
     public static function markAssetsUploadedForCurrentTarget(): void {
-        $settings = WPStatic_Settings::getSettings();
+        $settings = Content2HTML_Settings::getSettings();
         $hash = self::targetIdentityHash($settings);
         $marker = (array) get_option('wpstatic_assets_uploaded_targets', []);
         $marker[$hash] = true;
@@ -210,7 +210,7 @@ class WPStatic_BatchController {
      * @return array{result: array, assetsIncluded: bool, assetsSkipForced: bool}
      */
     public static function finalizeUpload(bool $skipAssets): array {
-        $settings = WPStatic_Settings::getSettings();
+        $settings = Content2HTML_Settings::getSettings();
         $uploader = self::buildUploader();
 
         if ($settings['target'] === 'netlify') {
@@ -252,9 +252,9 @@ class WPStatic_BatchController {
      * uploaded, specifically.
      */
     public static function uploadAssetsOnly(): array {
-        WPStatic_AssetsManager::copyToBuild(self::getBuildDir()); // forced re-copy, regardless of the current state
+        Content2HTML_AssetsManager::copyToBuild(self::getBuildDir()); // forced re-copy, regardless of the current state
 
-        $settings = WPStatic_Settings::getSettings();
+        $settings = Content2HTML_Settings::getSettings();
         $uploader = self::buildUploader();
 
         if ($settings['target'] === 'netlify') {
@@ -292,7 +292,7 @@ class WPStatic_BatchController {
      *
      * @return array{total: int, wp_content_files: string[]}
      */
-    private static function uploadBuildDir(WPStatic_Uploader $uploader, bool $excludeAssets): array {
+    private static function uploadBuildDir(Content2HTML_Uploader $uploader, bool $excludeAssets): array {
         $buildDir = self::getBuildDir();
 
         $files = new RecursiveIteratorIterator(
@@ -370,25 +370,4 @@ class WPStatic_BatchController {
         return copy($sourceFile, $rootIndex);
     }
 
-    private static function rrmdir(string $dir): void {
-        if (!is_dir($dir)) {
-            return;
-        }
-
-        foreach (scandir($dir) as $object) {
-            if ($object === '.' || $object === '..') {
-                continue;
-            }
-
-            $path = $dir . '/' . $object;
-
-            if (is_dir($path) && !is_link($path)) {
-                self::rrmdir($path);
-            } else {
-                unlink($path);
-            }
-        }
-
-        rmdir($dir);
-    }
 }

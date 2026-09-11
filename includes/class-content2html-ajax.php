@@ -4,7 +4,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class WPStatic_AjaxController {
+class Content2HTML_AjaxController {
     private const NONCE_ACTION = 'wpstatic_deploy_ajax';
     private const QUEUE_TRANSIENT_PREFIX = 'wpstatic_deploy_queue_';
     private const FRONT_FILE_TRANSIENT_PREFIX = 'wpstatic_deploy_frontfile_';
@@ -43,10 +43,10 @@ class WPStatic_AjaxController {
         $this->checkAccess();
 
         try {
-            WPStatic_BatchController::resetBuildDir();
-            WPStatic_BatchController::copyAssetsToBuild();
-            WPStatic_BatchController::buildFormHandler();
-            $queue = WPStatic_BatchController::buildQueue();
+            Content2HTML_BatchController::resetBuildDir();
+            Content2HTML_BatchController::copyAssetsToBuild();
+            Content2HTML_BatchController::buildFormHandler();
+            $queue = Content2HTML_BatchController::buildQueue();
         } catch (Throwable $e) {
             wp_send_json_error(['message' => $e->getMessage()]);
         }
@@ -58,8 +58,8 @@ class WPStatic_AjaxController {
 
         wp_send_json_success([
             'total' => count($queue),
-            'assets_ever_uploaded' => WPStatic_BatchController::assetsEverUploadedForCurrentTarget(),
-            'has_assets' => WPStatic_AssetsManager::hasAssets(),
+            'assets_ever_uploaded' => Content2HTML_BatchController::assetsEverUploadedForCurrentTarget(),
+            'has_assets' => Content2HTML_AssetsManager::hasAssets(),
         ]);
     }
 
@@ -77,11 +77,11 @@ class WPStatic_AjaxController {
 
         $slice = array_slice($queue, $offset, $batchSize);
         $errors = [];
-        $frontPageId = WPStatic_BatchController::getFrontPageId();
+        $frontPageId = Content2HTML_BatchController::getFrontPageId();
 
         foreach ($slice as $item) {
             try {
-                $newFiles = WPStatic_BatchController::generateSingle((int) $item['id'], (string) $item['post_type']);
+                $newFiles = Content2HTML_BatchController::generateSingle((int) $item['id'], (string) $item['post_type']);
 
                 if ($frontPageId > 0 && (int) $item['id'] === $frontPageId) {
                     foreach ($newFiles as $newFile) {
@@ -107,16 +107,16 @@ class WPStatic_AjaxController {
     public function handleFinalize(): void {
         $this->checkAccess();
 
-        $skipAssets = ($_POST['skip_assets'] ?? '') === '1';
+        $skipAssets = sanitize_text_field(wp_unslash($_POST['skip_assets'] ?? '')) === '1';
 
         try {
             $frontFile = get_transient($this->frontFileTransientKey());
 
             if (is_string($frontFile) && $frontFile !== '') {
-                WPStatic_BatchController::copyToRootIndex($frontFile);
+                Content2HTML_BatchController::copyToRootIndex($frontFile);
             }
 
-            $upload = WPStatic_BatchController::finalizeUpload($skipAssets);
+            $upload = Content2HTML_BatchController::finalizeUpload($skipAssets);
         } catch (Throwable $e) {
             wp_send_json_error(['message' => $e->getMessage()]);
         }
@@ -167,7 +167,7 @@ class WPStatic_AjaxController {
             wp_send_json_error(['message' => __('Insufficient permissions for this post.', 'content2html')], 403);
         }
 
-        $settings = WPStatic_Settings::getSettings();
+        $settings = Content2HTML_Settings::getSettings();
 
         try {
             if ($settings['target'] === 'netlify') {
@@ -177,15 +177,15 @@ class WPStatic_AjaxController {
                 // redeploy.
                 set_time_limit(0); // can take a while on larger sites
 
-                WPStatic_BatchController::resetBuildDir();
-                WPStatic_BatchController::copyAssetsToBuild(); // resetBuildDir() just deleted them
-                WPStatic_BatchController::buildFormHandler();
-                $queue = WPStatic_BatchController::buildQueue();
-                $frontPageId = WPStatic_BatchController::getFrontPageId();
+                Content2HTML_BatchController::resetBuildDir();
+                Content2HTML_BatchController::copyAssetsToBuild(); // resetBuildDir() just deleted them
+                Content2HTML_BatchController::buildFormHandler();
+                $queue = Content2HTML_BatchController::buildQueue();
+                $frontPageId = Content2HTML_BatchController::getFrontPageId();
                 $frontFile = null;
 
                 foreach ($queue as $item) {
-                    $newFiles = WPStatic_BatchController::generateSingle((int) $item['id'], (string) $item['post_type']);
+                    $newFiles = Content2HTML_BatchController::generateSingle((int) $item['id'], (string) $item['post_type']);
 
                     if ($frontPageId > 0 && (int) $item['id'] === $frontPageId) {
                         foreach ($newFiles as $newFile) {
@@ -198,12 +198,12 @@ class WPStatic_AjaxController {
                 }
 
                 if ($frontFile !== null) {
-                    WPStatic_BatchController::copyToRootIndex($frontFile);
+                    Content2HTML_BatchController::copyToRootIndex($frontFile);
                 }
 
-                $uploader = WPStatic_BatchController::buildUploader();
-                $result = $uploader->uploadDirectory(WPStatic_BatchController::getBuildDir());
-                WPStatic_BatchController::markAssetsUploadedForCurrentTarget();
+                $uploader = Content2HTML_BatchController::buildUploader();
+                $result = $uploader->uploadDirectory(Content2HTML_BatchController::getBuildDir());
+                Content2HTML_BatchController::markAssetsUploadedForCurrentTarget();
 
                 wp_send_json_success(array_merge(
                     ['message' => __('Netlify does not support single-page deploys - the entire site was rebuilt and redeployed.', 'content2html')],
@@ -212,15 +212,15 @@ class WPStatic_AjaxController {
             }
 
             // SFTP: only generate and specifically upload this one page.
-            WPStatic_BatchController::copyAssetsToBuild(); // in case this is the very first operation ever
-            $newFiles = WPStatic_BatchController::generateSingle($postId, $post->post_type);
+            Content2HTML_BatchController::copyAssetsToBuild(); // in case this is the very first operation ever
+            $newFiles = Content2HTML_BatchController::generateSingle($postId, $post->post_type);
 
             // If the page being edited happens to be the configured front
             // page, additionally refresh and upload the index.html in the
             // root directory as well.
-            if ($postId === WPStatic_BatchController::getFrontPageId()) {
+            if ($postId === Content2HTML_BatchController::getFrontPageId()) {
                 foreach ($newFiles as $newFile) {
-                    if (substr($newFile, -5) === '.html' && WPStatic_BatchController::copyToRootIndex($newFile)) {
+                    if (substr($newFile, -5) === '.html' && Content2HTML_BatchController::copyToRootIndex($newFile)) {
                         $newFiles[] = 'index.html';
                         break;
                     }
@@ -231,8 +231,8 @@ class WPStatic_AjaxController {
                 wp_send_json_error(['message' => __('No new files were generated - please check the configuration.', 'content2html')]);
             }
 
-            $uploader = WPStatic_BatchController::buildUploader();
-            $buildDir = WPStatic_BatchController::getBuildDir();
+            $uploader = Content2HTML_BatchController::buildUploader();
+            $buildDir = Content2HTML_BatchController::getBuildDir();
 
             foreach ($newFiles as $relativePath) {
                 $uploader->uploadFile($buildDir . '/' . $relativePath, $relativePath);
@@ -254,12 +254,12 @@ class WPStatic_AjaxController {
     public function handleAssetsOnly(): void {
         $this->checkAccess();
 
-        if (!WPStatic_AssetsManager::hasAssets()) {
+        if (!Content2HTML_AssetsManager::hasAssets()) {
             wp_send_json_error(['message' => __('No assets set up - please upload an assets.zip first.', 'content2html')]);
         }
 
         try {
-            $result = WPStatic_BatchController::uploadAssetsOnly();
+            $result = Content2HTML_BatchController::uploadAssetsOnly();
         } catch (Throwable $e) {
             wp_send_json_error(['message' => $e->getMessage()]);
         }
@@ -271,22 +271,33 @@ class WPStatic_AjaxController {
     // Connection tests (SFTP / Netlify) - use the current, not-yet-saved
     // form values; secret fields left empty fall back to the already
     // saved (decrypted) value, mirroring the save logic in
-    // WPStatic_Settings::handleSave().
+    // Content2HTML_Settings::handleSave().
     // -----------------------------------------------------------------
 
     public function handleTestSftp(): void {
         $this->checkAccess();
 
-        $existing = WPStatic_Settings::getSettings();
+        $existing = Content2HTML_Settings::getSettings();
 
         $rawAuthMethod = sanitize_key(wp_unslash($_POST['sftp_auth_method'] ?? ''));
+
+        // Deliberately NOT run through sanitize_text_field() or similar:
+        // these are opaque secret values (password/private
+        // key/passphrase) where such sanitization could corrupt the
+        // exact value needed to authenticate (e.g. stripping newlines
+        // from a multi-line PEM private key). wp_unslash() alone is
+        // sufficient - never echoed back as HTML, only used to attempt
+        // an SFTP connection.
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
         $rawPassword = wp_unslash($_POST['sftp_password'] ?? '');
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
         $rawPrivateKey = wp_unslash($_POST['sftp_private_key'] ?? '');
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
         $rawPassphrase = wp_unslash($_POST['sftp_passphrase'] ?? '');
 
         $settings = [
             'sftp_host' => sanitize_text_field(wp_unslash($_POST['sftp_host'] ?? '')),
-            'sftp_port' => max(1, (int) wp_unslash($_POST['sftp_port'] ?? 22)),
+            'sftp_port' => max(1, absint(wp_unslash($_POST['sftp_port'] ?? 22))),
             'sftp_username' => sanitize_text_field(wp_unslash($_POST['sftp_username'] ?? '')),
             'sftp_auth_method' => in_array($rawAuthMethod, ['password', 'key'], true)
                 ? $rawAuthMethod
@@ -298,7 +309,7 @@ class WPStatic_AjaxController {
         ];
 
         try {
-            $uploader = new WPStatic_SftpUploader($settings);
+            $uploader = new Content2HTML_SftpUploader($settings);
             $uploader->testConnection();
         } catch (Throwable $e) {
             wp_send_json_error(['message' => $e->getMessage()]);
@@ -310,8 +321,12 @@ class WPStatic_AjaxController {
     public function handleTestNetlify(): void {
         $this->checkAccess();
 
-        $existing = WPStatic_Settings::getSettings();
+        $existing = Content2HTML_Settings::getSettings();
 
+        // Deliberately NOT sanitize_text_field()'d - an opaque API
+        // token, never echoed back as HTML (see the same note above for
+        // the SFTP credentials).
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
         $rawToken = wp_unslash($_POST['netlify_token'] ?? '');
 
         $settings = [
@@ -320,7 +335,7 @@ class WPStatic_AjaxController {
         ];
 
         try {
-            $uploader = new WPStatic_NetlifyUploader($settings);
+            $uploader = new Content2HTML_NetlifyUploader($settings);
             $uploader->testConnection();
         } catch (Throwable $e) {
             wp_send_json_error(['message' => $e->getMessage()]);

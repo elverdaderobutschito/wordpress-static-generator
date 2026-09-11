@@ -8,7 +8,7 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Use WordPress as a headless CMS without building a WordPress theme. Upload your HTML template, define your own injection points, and publish the result as a static website.
+Use WordPress as a headless CMS. Upload your own HTML template, define injection points, publish a static website.
 
 == Description ==
 
@@ -41,8 +41,8 @@ All are MIT-licensed and compatible with this plugin's GPLv2-or-later license. S
 
 This plugin only contacts external services that you explicitly configure and trigger yourself:
 
-* If you configure a Netlify site and click "Deploy", the plugin sends your generated site files to the [Netlify API](https://docs.netlify.com/) using the access token you provide.
-* If you configure an SFTP target, the plugin connects to the host you specify to upload files.
+* **Netlify** - if you configure a Netlify site and click "Deploy" (or "Test connection"), the plugin sends your generated site files (and, for the connection test, a simple API request) to the Netlify API (`https://api.netlify.com`), authenticated with the access token you provide. This happens only when you actively trigger a deploy or connection test - never automatically or in the background. [Terms of Service](https://www.netlify.com/legal/terms-of-use/), [Privacy Policy](https://www.netlify.com/privacy/).
+* **Your own SFTP host** - if you configure an SFTP target, the plugin connects to the host you specify to upload files, using the credentials you provide. This is a server of your own choosing, not a service operated by this plugin's author.
 
 No data is sent anywhere without an explicit action from you, and no usage tracking or analytics of any kind is built into this plugin.
 

@@ -4,12 +4,12 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class WPStatic_Settings {
+class Content2HTML_Settings {
     public const OPTION_KEY = 'wpstatic_deploy_settings';
     private const NONCE_ACTION = 'wpstatic_deploy_settings_save';
 
     // Fields whose values are stored encrypted in the DB (see
-    // WPStatic_Crypto). Everything else is stored as plain text in
+    // Content2HTML_Crypto). Everything else is stored as plain text in
     // wp_options (those aren't secrets).
     private const ENCRYPTED_FIELDS = [
         'netlify_token',
@@ -85,7 +85,7 @@ class WPStatic_Settings {
         // getRawSettingsForForm() instead).
         foreach (self::ENCRYPTED_FIELDS as $field) {
             if (!empty($settings[$field])) {
-                $settings[$field] = WPStatic_Crypto::decrypt($settings[$field]);
+                $settings[$field] = Content2HTML_Crypto::decrypt($settings[$field]);
             }
         }
 
@@ -187,7 +187,7 @@ class WPStatic_Settings {
         $existing = (array) get_option(self::OPTION_KEY, []);
 
         $postTypes = array_values(array_intersect(
-            (array) wp_unslash($_POST['post_types'] ?? []),
+            array_map('sanitize_text_field', wp_unslash((array) ($_POST['post_types'] ?? []))),
             ['post', 'page']
         ));
 
@@ -206,7 +206,7 @@ class WPStatic_Settings {
             'netlify_site_id' => sanitize_text_field(wp_unslash($_POST['netlify_site_id'] ?? '')),
 
             'sftp_host' => sanitize_text_field(wp_unslash($_POST['sftp_host'] ?? '')),
-            'sftp_port' => max(1, (int) wp_unslash($_POST['sftp_port'] ?? 22)),
+            'sftp_port' => max(1, absint(wp_unslash($_POST['sftp_port'] ?? 22))),
             'sftp_username' => sanitize_text_field(wp_unslash($_POST['sftp_username'] ?? '')),
             'sftp_auth_method' => in_array($rawSftpAuthMethod, ['password', 'key'], true) ? $rawSftpAuthMethod : 'password',
             'sftp_remote_base_path' => '/' . ltrim(sanitize_text_field(wp_unslash($_POST['sftp_remote_base_path'] ?? '/')), '/'),
@@ -216,11 +216,11 @@ class WPStatic_Settings {
             'form_from_email' => sanitize_text_field(wp_unslash($_POST['form_from_email'] ?? '')),
             'form_subject_prefix' => sanitize_text_field(wp_unslash($_POST['form_subject_prefix'] ?? '')),
             'form_redirect_url' => esc_url_raw(wp_unslash($_POST['form_redirect_url'] ?? '')),
-            'form_honeypot_field' => preg_replace('/[^a-zA-Z0-9_-]/', '', wp_unslash($_POST['form_honeypot_field'] ?? '')) ?: '_gotcha',
+            'form_honeypot_field' => preg_replace('/[^a-zA-Z0-9_-]/', '', sanitize_text_field(wp_unslash($_POST['form_honeypot_field'] ?? ''))) ?: '_gotcha',
             'form_custom_action' => sanitize_text_field(wp_unslash($_POST['form_custom_action'] ?? '')),
 
             'nav_main_enabled' => !empty($_POST['nav_main_enabled']) ? 'on' : '',
-            'nav_main_menu_id' => (int) wp_unslash($_POST['nav_main_menu_id'] ?? 0),
+            'nav_main_menu_id' => absint(wp_unslash($_POST['nav_main_menu_id'] ?? 0)),
             'nav_main_wrapper_marker' => sanitize_text_field(wp_unslash($_POST['nav_main_wrapper_marker'] ?? '')),
             'nav_main_item_marker' => sanitize_text_field(wp_unslash($_POST['nav_main_item_marker'] ?? '')),
             'nav_main_parent_item_marker' => sanitize_text_field(wp_unslash($_POST['nav_main_parent_item_marker'] ?? '')),
@@ -228,14 +228,14 @@ class WPStatic_Settings {
             'nav_main_submenu_item_marker' => sanitize_text_field(wp_unslash($_POST['nav_main_submenu_item_marker'] ?? '')),
 
             'nav_footer_enabled' => !empty($_POST['nav_footer_enabled']) ? 'on' : '',
-            'nav_footer_menu_id' => (int) wp_unslash($_POST['nav_footer_menu_id'] ?? 0),
+            'nav_footer_menu_id' => absint(wp_unslash($_POST['nav_footer_menu_id'] ?? 0)),
             'nav_footer_wrapper_marker' => sanitize_text_field(wp_unslash($_POST['nav_footer_wrapper_marker'] ?? '')),
             'nav_footer_item_marker' => sanitize_text_field(wp_unslash($_POST['nav_footer_item_marker'] ?? '')),
             'nav_footer_parent_item_marker' => sanitize_text_field(wp_unslash($_POST['nav_footer_parent_item_marker'] ?? '')),
             'nav_footer_submenu_wrapper_marker' => sanitize_text_field(wp_unslash($_POST['nav_footer_submenu_wrapper_marker'] ?? '')),
             'nav_footer_submenu_item_marker' => sanitize_text_field(wp_unslash($_POST['nav_footer_submenu_item_marker'] ?? '')),
 
-            'nav_active_class' => preg_replace('/[^a-zA-Z0-9_ -]/', '', wp_unslash($_POST['nav_active_class'] ?? '')) ?: 'active',
+            'nav_active_class' => preg_replace('/[^a-zA-Z0-9_ -]/', '', sanitize_text_field(wp_unslash($_POST['nav_active_class'] ?? ''))) ?: 'active',
         ];
 
         // File upload for the template (via wp_handle_upload, not via a
@@ -292,7 +292,7 @@ class WPStatic_Settings {
                 } else {
                     set_transient('wpstatic_template_upload_error', $uploadedTemplate['error'] ?? __('Unknown error while uploading.', 'content2html'), MINUTE_IN_SECONDS * 5);
                 }
-            } elseif (isset($_FILES['new_template_file']) && $_FILES['new_template_file']['error'] !== UPLOAD_ERR_NO_FILE) {
+            } elseif (isset($_FILES['new_template_file']['error']) && $_FILES['new_template_file']['error'] !== UPLOAD_ERR_NO_FILE) {
                 set_transient('wpstatic_template_upload_error', self::uploadErrorMessage((int) $_FILES['new_template_file']['error']), MINUTE_IN_SECONDS * 5);
             } else {
                 set_transient('wpstatic_template_upload_error', __('A name for the new template was given, but no file was selected.', 'content2html'), MINUTE_IN_SECONDS * 5);
@@ -310,10 +310,19 @@ class WPStatic_Settings {
         // entered (an empty field means "leave unchanged", so you don't
         // have to retype every password on every save).
         foreach (self::ENCRYPTED_FIELDS as $field) {
+            // Deliberately NOT run through sanitize_text_field() or
+            // similar: these are opaque secret values (password/private
+            // key/passphrase/API token) where such sanitization could
+            // corrupt the exact value the user needs to authenticate
+            // (e.g. stripping newlines from a multi-line PEM private
+            // key). wp_unslash() alone is sufficient here - the value is
+            // never echoed back as HTML and goes straight into
+            // Content2HTML_Crypto::encrypt().
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
             $raw = wp_unslash($_POST[$field] ?? '');
 
             if ($raw !== '') {
-                $newValues[$field] = WPStatic_Crypto::encrypt($raw);
+                $newValues[$field] = Content2HTML_Crypto::encrypt($raw);
             } else {
                 $newValues[$field] = $existing[$field] ?? '';
             }
@@ -332,8 +341,8 @@ class WPStatic_Settings {
             && $newValues['target'] === 'netlify'
             && $newValues['form_redirect_url'] !== ''
         ) {
-            $redirectHost = parse_url($newValues['form_redirect_url'], PHP_URL_HOST);
-            $ownHost = parse_url(home_url(), PHP_URL_HOST);
+            $redirectHost = wp_parse_url($newValues['form_redirect_url'], PHP_URL_HOST);
+            $ownHost = wp_parse_url(home_url(), PHP_URL_HOST);
 
             if ($redirectHost !== null && $redirectHost === $ownHost) {
                 set_transient(
@@ -350,7 +359,7 @@ class WPStatic_Settings {
 
         update_option(self::OPTION_KEY, array_merge($existing, $newValues));
 
-        if (isset($_FILES['assets_zip']) && $_FILES['assets_zip']['error'] !== UPLOAD_ERR_NO_FILE) {
+        if (isset($_FILES['assets_zip']['error']) && $_FILES['assets_zip']['error'] !== UPLOAD_ERR_NO_FILE) {
             $error = (int) $_FILES['assets_zip']['error'];
 
             if ($error !== UPLOAD_ERR_OK) {
@@ -360,7 +369,9 @@ class WPStatic_Settings {
                     'warnings' => [],
                 ];
             } else {
-                $assetsResult = WPStatic_AssetsManager::extractZip($_FILES['assets_zip']['tmp_name']);
+                $assetsResult = isset($_FILES['assets_zip']['tmp_name'])
+                    ? Content2HTML_AssetsManager::extractZip(sanitize_text_field(wp_unslash($_FILES['assets_zip']['tmp_name'])))
+                    : ['ok' => false, 'message' => __('Unknown error while uploading.', 'content2html'), 'warnings' => []];
             }
 
             set_transient('wpstatic_assets_upload_result', $assetsResult, MINUTE_IN_SECONDS * 5);
@@ -411,7 +422,7 @@ class WPStatic_Settings {
         $localizeImages = !empty($_POST['markdown_localize_images']);
 
         try {
-            $zipPath = WPStatic_MarkdownExport::buildZip($settings, $localizeImages);
+            $zipPath = Content2HTML_MarkdownExport::buildZip($settings, $localizeImages);
         } catch (Throwable $e) {
             wp_die(esc_html__('Export failed:', 'content2html') . ' ' . esc_html($e->getMessage()));
         }
@@ -420,14 +431,21 @@ class WPStatic_Settings {
             wp_die(esc_html__('Export failed: the ZIP file was not created.', 'content2html'));
         }
 
-        $downloadName = 'markdown-export-' . date('Ymd_His') . '.zip';
+        $downloadName = 'markdown-export-' . gmdate('Ymd_His') . '.zip';
 
         header('Content-Type: application/zip');
         header('Content-Disposition: attachment; filename="' . $downloadName . '"');
         header('Content-Length: ' . filesize($zipPath));
-        readfile($zipPath);
 
-        unlink($zipPath);
+        // This is a raw binary ZIP file download (Content-Type/
+        // Content-Disposition/Content-Length headers above already
+        // mark it as such) - not HTML output. Running it through
+        // esc_html() would corrupt the binary data and break the
+        // download.
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        echo Content2HTML_Filesystem::getContents($zipPath);
+
+        Content2HTML_Filesystem::deleteFile($zipPath);
         exit;
     }
 
@@ -555,7 +573,14 @@ class WPStatic_Settings {
                 </p>
             </div>
 
-            <?php if (isset($_GET['saved'])): ?>
+            <?php
+            // Purely a display flag (shows a "Settings saved" notice
+            // after the redirect that follows a successful save) - no
+            // state change happens here, the actual save already went
+            // through check_admin_referer() in handleSave(). Nothing to
+            // verify a nonce against.
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            if (isset($_GET['saved'])): ?>
                 <div class="notice notice-success is-dismissible"><p><?php esc_html_e('Settings saved.', 'content2html'); ?></p></div>
             <?php endif; ?>
 
@@ -568,7 +593,7 @@ class WPStatic_Settings {
                 <div class="notice <?php echo esc_attr($noticeClass); ?> is-dismissible">
                     <p><?php echo esc_html($assetsUploadResult['message']); ?></p>
                     <?php if (!empty($assetsUploadResult['warnings'])): ?>
-                        <p><strong><?php esc_html_e('Warning: suspicious file types found in the assets', 'content2html'); ?></strong> (<?php esc_html_e('included anyway, please review', 'content2html'); ?>):</p>
+                        <p><strong><?php esc_html_e('Note: potentially executable file types were found and removed from the assets for security reasons', 'content2html'); ?></strong>:</p>
                         <ul style="list-style: disc; margin-left: 20px;">
                             <?php foreach ($assetsUploadResult['warnings'] as $warning): ?>
                                 <li><code><?php echo esc_html($warning); ?></code></li>
@@ -602,7 +627,7 @@ class WPStatic_Settings {
             }
             ?>
 
-            <?php if (!WPStatic_Crypto::usesConfigKey()): ?>
+            <?php if (!Content2HTML_Crypto::usesConfigKey()): ?>
                 <div class="notice notice-warning">
                     <p>
                         <?php esc_html_e('No', 'content2html'); ?> <code>WPSTATIC_ENCRYPTION_KEY</code> <?php esc_html_e('found in', 'content2html'); ?> <code>wp-config.php</code>.
@@ -687,7 +712,7 @@ class WPStatic_Settings {
                     <tr>
                         <th><label for="wpstatic_assets">Assets (CSS/JS/Fonts/Images)</label></th>
                         <td>
-                            <?php $assetsStatus = WPStatic_AssetsManager::getStatus(); ?>
+                            <?php $assetsStatus = Content2HTML_AssetsManager::getStatus(); ?>
                             <?php if ($assetsStatus['exists']): ?>
                                 <p>
                                     <?php esc_html_e('Currently set up:', 'content2html'); ?> <strong><?php echo esc_html((string) $assetsStatus['file_count']); ?> <?php esc_html_e('files', 'content2html'); ?></strong>

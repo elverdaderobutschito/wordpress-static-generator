@@ -5,7 +5,7 @@ Upload your HTML template, define your own injection points, and
 publish the result as a static website.
 
 Generates static HTML files from WordPress content (posts/pages) using
-`WPHeadlessStaticGenerator.php` - directly, internally, via
+`class-content2html-generator.php` - directly, internally, via
 `rest_do_request()`, without an HTTP loopback - and uploads them via
 **SFTP** or **Netlify** to a configurable target, preserving the
 directory structure (permalink paths) defined in WordPress.
@@ -202,12 +202,12 @@ the template already has one of its own.
 
 - The SFTP password/key and Netlify token are stored **encrypted** (not
   in plain text) in `wp_options`, see
-  `includes/class-wpstatic-crypto.php`.
+  `includes/class-content2html-crypto.php`.
 - Only users with `manage_options` (administrators) can change the
   settings and trigger "Deploy all". The single-page button additionally
   checks `edit_post` for the respective post.
 - The local build directory lives at
-  `wp-content/uploads/wpstatic-build/` and is emptied and refilled on
+  `wp-content/uploads/content2html-build/` and is emptied and refilled on
   every "Deploy all" run.
 
 ## License notes for bundled libraries

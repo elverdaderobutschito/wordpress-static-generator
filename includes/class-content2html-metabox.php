@@ -4,7 +4,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class WPStatic_MetaBox {
+class Content2HTML_MetaBox {
     public function __construct() {
         add_action('add_meta_boxes', [$this, 'register']);
         add_action('admin_enqueue_scripts', [$this, 'enqueueAssets']);
@@ -12,7 +12,7 @@ class WPStatic_MetaBox {
     }
 
     public function register(): void {
-        $settings = WPStatic_Settings::getSettings();
+        $settings = Content2HTML_Settings::getSettings();
 
         foreach ($settings['post_types'] as $postType) {
             add_meta_box(
@@ -27,7 +27,7 @@ class WPStatic_MetaBox {
     }
 
     public function render(WP_Post $post): void {
-        $settings = WPStatic_Settings::getSettings();
+        $settings = Content2HTML_Settings::getSettings();
 
         if (empty($settings['template_path'])) {
             echo '<p>' . sprintf(
@@ -80,7 +80,7 @@ class WPStatic_MetaBox {
      * NOT through our AJAX deploy button.
      */
     public function saveTemplateSelection(int $postId): void {
-        if (!isset($_POST['wpstatic_template_nonce']) || !wp_verify_nonce(wp_unslash($_POST['wpstatic_template_nonce']), 'wpstatic_template_select')) {
+        if (!isset($_POST['wpstatic_template_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['wpstatic_template_nonce'])), 'wpstatic_template_select')) {
             return;
         }
 

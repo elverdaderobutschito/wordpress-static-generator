@@ -23,7 +23,7 @@ if (!defined('ABSPATH')) {
  * submenu item that itself has children is automatically handled with
  * the parent item template again.
  */
-class WPStatic_Navigation {
+class Content2HTML_Navigation {
     /**
      * Replaces wrapper marker blocks in the template with the generated
      * navigation - once for the main navigation, once for the footer
@@ -228,7 +228,7 @@ class WPStatic_Navigation {
      * links posts/pages via a query-string ID (?page_id=2 or ?p=5)
      * instead of via a path segment. A static export can't represent
      * that as a file of its own - posts end up under {slug}.{id}.html
-     * instead (see createFilename() in WPHeadlessStaticGenerator.php).
+     * instead (see createFilename() in Content2HTML_Generator.php).
      * The same conversion is reproduced here for navigation links, so
      * they point to the file that's actually generated instead of the
      * ?page_id= URL (which never exists in a static export). With other

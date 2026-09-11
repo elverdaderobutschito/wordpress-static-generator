@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
  * folder (see README) - this way, the extracted structure matches
  * exactly what the template references (assets/bootstrap/css/...).
  */
-class WPStatic_AssetsManager {
+class Content2HTML_AssetsManager {
     private const DANGEROUS_EXTENSIONS = [
         'php', 'phtml', 'php3', 'php4', 'php5', 'php7', 'phps', 'pht',
         'phar', 'cgi', 'pl', 'asp', 'aspx', 'jsp',
@@ -18,7 +18,7 @@ class WPStatic_AssetsManager {
 
     public static function getStorageDir(): string {
         $upload = wp_upload_dir();
-        return trailingslashit($upload['basedir']) . 'wpstatic-assets';
+        return trailingslashit($upload['basedir']) . 'content2html-assets';
     }
 
     /**
@@ -106,21 +106,24 @@ class WPStatic_AssetsManager {
         $zip->close();
 
         if (!$extracted) {
-            self::rrmdir($stagingDir);
+            Content2HTML_Filesystem::deleteDir($stagingDir);
             return ['ok' => false, 'message' => __('Extracting the ZIP file failed.', 'content2html'), 'warnings' => []];
         }
 
         $stagedAssetsDir = $stagingDir . '/assets';
 
         if (!is_dir($stagedAssetsDir)) {
-            self::rrmdir($stagingDir);
+            Content2HTML_Filesystem::deleteDir($stagingDir);
             return ['ok' => false, 'message' => __('No "assets/" folder found after extraction.', 'content2html'), 'warnings' => []];
         }
 
-        // Safety check: suspicious, potentially executable file types. Does
-        // NOT block the upload (there could be a legitimate reason for
-        // it), but warns clearly.
-        $warnings = self::scanForDangerousFiles($stagedAssetsDir);
+        // Security: remove executable/server-script file types before
+        // they ever reach persistent storage (and, from there,
+        // copyToBuild()'s target - a web-accessible uploads directory).
+        // Previously this only produced a warning and still let the
+        // files through; blocking them outright closes the underlying
+        // risk instead of just flagging it.
+        $removed = self::removeDangerousFiles($stagedAssetsDir);
 
         // Replace the old assets folder (atomic enough for this purpose:
         // prepare the new folder first, then remove the old one, then
@@ -128,16 +131,16 @@ class WPStatic_AssetsManager {
         $storageDir = self::getStorageDir();
 
         if (is_dir($storageDir)) {
-            self::rrmdir($storageDir);
+            Content2HTML_Filesystem::deleteDir($storageDir);
         }
 
         wp_mkdir_p($storageDir);
-        $moved = rename($stagedAssetsDir, $storageDir . '/assets');
+        $moved = Content2HTML_Filesystem::move($stagedAssetsDir, $storageDir . '/assets');
 
-        self::rrmdir($stagingDir); // clean up any ZIP extras (__MACOSX etc.)
+        Content2HTML_Filesystem::deleteDir($stagingDir); // clean up any ZIP extras (__MACOSX etc.)
 
         if (!$moved) {
-            return ['ok' => false, 'message' => __('Could not move assets to the target location.', 'content2html'), 'warnings' => $warnings];
+            return ['ok' => false, 'message' => __('Could not move assets to the target location.', 'content2html'), 'warnings' => $removed];
         }
 
         update_option('wpstatic_assets_updated_at', time(), false);
@@ -145,10 +148,10 @@ class WPStatic_AssetsManager {
         // New assets were uploaded -> for all previous targets, the
         // "have already been uploaded" marker must be reset, otherwise
         // the NEW assets might accidentally never get uploaded to the
-        // SFTP target (see WPStatic_BatchController).
+        // SFTP target (see Content2HTML_BatchController).
         update_option('wpstatic_assets_uploaded_targets', [], false);
 
-        return ['ok' => true, 'message' => __('Assets updated successfully.', 'content2html'), 'warnings' => $warnings];
+        return ['ok' => true, 'message' => __('Assets updated successfully.', 'content2html'), 'warnings' => $removed];
     }
 
     public static function copyToBuild(string $buildDir): void {
@@ -162,7 +165,7 @@ class WPStatic_AssetsManager {
         // Empty it completely beforehand instead of just overwriting, so
         // removed/renamed assets don't stick around as leftovers.
         if (is_dir($destination)) {
-            self::rrmdir($destination);
+            Content2HTML_Filesystem::deleteDir($destination);
         }
 
         wp_mkdir_p($destination);
@@ -178,14 +181,32 @@ class WPStatic_AssetsManager {
 
             if ($file->isDir()) {
                 wp_mkdir_p($target);
-            } else {
-                copy($file->getPathname(), $target);
+                continue;
             }
+
+            // Defense in depth: skip executable/server-script file types
+            // here too, even though removeDangerousFiles() should
+            // already have caught them at upload time - this is the
+            // function that actually populates the web-accessible build
+            // directory, so it gets its own independent check.
+            $ext = strtolower(pathinfo($file->getFilename(), PATHINFO_EXTENSION));
+
+            if (in_array($ext, self::DANGEROUS_EXTENSIONS, true)) {
+                continue;
+            }
+
+            copy($file->getPathname(), $target);
         }
     }
 
-    private static function scanForDangerousFiles(string $dir): array {
-        $warnings = [];
+    /**
+     * Deletes executable/server-script file types from an extracted
+     * assets folder (in place) - see the security note in extractZip().
+     *
+     * @return string[] Relative paths of the files that were removed.
+     */
+    private static function removeDangerousFiles(string $dir): array {
+        $removed = [];
 
         $files = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS)
@@ -199,32 +220,12 @@ class WPStatic_AssetsManager {
             $ext = strtolower(pathinfo($file->getFilename(), PATHINFO_EXTENSION));
 
             if (in_array($ext, self::DANGEROUS_EXTENSIONS, true)) {
-                $warnings[] = ltrim(str_replace($dir, '', $file->getPathname()), '/');
+                $removed[] = ltrim(str_replace($dir, '', $file->getPathname()), '/');
+                Content2HTML_Filesystem::deleteFile($file->getPathname());
             }
         }
 
-        return $warnings;
+        return $removed;
     }
 
-    private static function rrmdir(string $dir): void {
-        if (!is_dir($dir)) {
-            return;
-        }
-
-        foreach (scandir($dir) as $object) {
-            if ($object === '.' || $object === '..') {
-                continue;
-            }
-
-            $path = $dir . '/' . $object;
-
-            if (is_dir($path) && !is_link($path)) {
-                self::rrmdir($path);
-            } else {
-                unlink($path);
-            }
-        }
-
-        rmdir($dir);
-    }
 }
